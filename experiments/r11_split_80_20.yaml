@@ -1,0 +1,42 @@
+# =============================================================================
+# R11 - Sensibilidade ao split (80/20)
+# -----------------------------------------------------------------------------
+# !!! RODAR SÓ DEPOIS DO TESTE FINAL NO 70/30 !!!
+#
+# Pergunta: o resultado final muda se o split for 80/20 em vez de 70/30?
+# Decisão do grupo (opção B): todas as rodadas usam o 70/30; aqui só a configuração FINAL é
+# refeita no 80/20 (CV e teste), junto com os baselines do R0, para o teste final ter a
+# mesma comparação. O 80/20 NÃO é usado para escolher nada: os dois resultados vão para o
+# artigo, e a leitura é se a diferença cabe na variação entre os folds.
+#
+# Rodar e ler:
+#   python run_experiments.py experiments/r11_split_80_20.yaml
+#   python final_test.py --run <R11_svm> --baselines <R11_dummy> <R11_logreg> <R11_gboost>
+#   python split_check.py --run70 <execução final do 70/30> --run80 <R11_svm>
+# =============================================================================
+
+baseline_name: R11_svm
+
+baseline:
+  split: "80_20"
+  zeros: to_nan             # ATUALIZAR: EXATAMENTE a config final do 70/30
+  missing_flags: none
+  imputer: median
+  features: none
+  drop_cols: none
+  encoding: onehot
+  scaler: standard
+  selection: none
+  model: {name: svm}
+  # threshold: ...
+  # calibration: ...
+
+experiments:
+  # Baselines do R0 no 80/20, com o pré-processamento da config final (sem limiar e sem
+  # calibração: o R0 não tem)
+  - name: R11_dummy
+    override: {model: {name: dummy}, threshold: none, calibration: none}
+  - name: R11_logreg
+    override: {model: {name: logreg}, threshold: none, calibration: none}
+  - name: R11_gboost
+    override: {model: {name: gboost}, threshold: none, calibration: none}

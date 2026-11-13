@@ -1,0 +1,52 @@
+# =============================================================================
+# R7 - Juntar tudo, conferir (ablação) e reajustar C/gamma
+# -----------------------------------------------------------------------------
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (combinação dos vencedores R1-R6) !!!
+#
+# Perguntas:
+#   1. Os vencedores funcionam juntos, e cada um ainda é necessário? (ablação: cada
+#      experimento tira UM vencedor e compara com a combinação completa)
+#   2. Depois das mudanças nos dados (R2) e nas colunas (R5), o C/gamma do R4 ainda é o
+#      melhor? (como a R5 da árvore de decisão: uma grade pequena em volta do vencedor)
+# Critério: roc_auc e recall, contra a combinação completa (--ref). Uma ablação sem diferença
+#           significativa = aquele vencedor pode sair (fica a mais simples).
+#
+# Os overrides abaixo são EXEMPLOS: escreva um por vencedor que não seja o padrão.
+#
+# Fechar a rodada:
+#   python compare.py --rodada R7_ --ref <pasta do R7_baseline ou do vencedor do R6> --salvar
+#   python compare.py --rodada R7_ --ref <mesma pasta> --metric recall --salvar
+# =============================================================================
+
+baseline_name: R7_baseline
+
+baseline:
+  zeros: to_nan             # ATUALIZAR: vencedor do R2_ausentes
+  missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
+  imputer: median           # ATUALIZAR: vencedor do R2_ausentes
+  features: none            # ATUALIZAR: vencedor do R2_oldpeak
+  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  encoding: onehot
+  scaler: standard          # ATUALIZAR: vencedor do R1
+  selection: none           # ATUALIZAR: vencedor do R5
+  model: {name: svm}        # ATUALIZAR: vencedor do R4 (+ class_weight, se venceu no R6)
+  # threshold: {name: tuned, scoring: f2}   # ATUALIZAR: vencedor do R6, se for o limiar
+
+experiments:
+  # --- ablação (exemplos; ajustar aos vencedores reais) ---
+  - name: R7_sem_tratamento_zeros
+    override: {zeros: none, missing_flags: none, imputer: none}
+
+  - name: R7_sem_selecao
+    override: {selection: none}
+
+  - name: R7_sem_limiar
+    override: {threshold: none}
+
+  # --- reajuste: grade pequena em volta do vencedor do R4 (ex.: C/3 a C*3) ---
+  - name: R7_reajuste
+    override:
+      model: {name: svm, kernel: rbf}   # ATUALIZAR: kernel do vencedor (+ class_weight)
+    sweep:
+      model.C: [0.3, 1.0, 3.0]          # ATUALIZAR: em volta do C vencedor
+      model.gamma: [0.003, 0.01, 0.03]  # ATUALIZAR: em volta do gamma vencedor

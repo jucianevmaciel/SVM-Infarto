@@ -1,0 +1,83 @@
+# =============================================================================
+# R2 - Qualidade dos dados: zeros impossíveis e Oldpeak negativo
+# -----------------------------------------------------------------------------
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (vencedor do R1) !!!
+#
+# Três perguntas, fechadas separadamente (prefixos diferentes):
+#
+# R2_ausentes - Como tratar Cholesterol = 0 (~19% da base) e RestingBP = 0 (1 paciente)?
+#   R2_zeros_crus       deixa o 0 como valor real (o erro que o grupo apontou; referência)
+#   R2_ausentes         imputador x flag Cholesterol_missing ("was_missing")
+#                         median            mediana da coluna (o baseline)
+#                         median_by_group   mediana por Sex
+#   R2_ausentes_idade   mediana por faixa de idade (<45, 45-55, 55-65, >65), com e sem flag
+#   (knn_scaled fica disponível; entra se o grupo quiser um imputador "sofisticado")
+#   Nunca agrupar pelo alvo HeartDisease: vazaria o rótulo para o atributo.
+#   Critério: roc_auc. A mais simples no empate: median -> median_by_group -> knn; sem flag
+#             antes de com flag.
+#
+# R2_atalho - O ganho da flag vem do colesterol ou do hospital de origem?
+#   Na base, Cholesterol = 0 tem 88% de doentes; registrado, 48%. Os zeros vêm quase todos da
+#   base suíça: a flag pode ensinar "veio daquele hospital" (atalho), não fisiologia.
+#   R2_atalho__sem_colesterol   tira a coluna Cholesterol (sem flag)
+#   R2_atalho__so_flag          tira o valor e deixa só a flag Cholesterol_missing
+#   Leitura (REGISTRADA ANTES DE RODAR, ver docs/anotacoes_artigo.md):
+#     - so_flag empata com median + flag  -> o valor do colesterol não ajuda; o que pesa
+#       é a ausência (atalho). Reportar como achado e limitação.
+#     - sem_colesterol empata com o vencedor do R2_ausentes -> pela regra da mais simples,
+#       fica sem o colesterol (menos colunas, sem depender do atalho).
+#     - se a flag vencer o R2_ausentes, conferir no robustez.py (R10) se o desempenho se
+#       mantém no subgrupo "colesterol registrado". Se cair, o ganho era o atalho.
+#   Fechar: python compare.py --rodada R2_atalho --incluir <R2_ausentes__imputer=median_missing_flags=flags>
+#           <vencedor do R2_ausentes> --salvar   (as pastas, em results/runs/)
+#
+# R2_oldpeak - O que fazer com os Oldpeak negativos (supradesnivelamento do ST)?
+#   none          mantém o valor (hipótese do grupo: igual ou melhor)
+#   oldpeak_abs   |Oldpeak|
+#   st_elevation  mantém e acrescenta a flag ST_elevation
+#   As linhas NÃO são removidas: todas as configs são avaliadas nos MESMOS pacientes.
+#   Critério: roc_auc; no empate, none.
+#
+# Fechar a rodada:  python compare.py --rodada R2_ausentes --incluir <vencedor do R1> --salvar
+#                   python compare.py --rodada R2_zeros --incluir <vencedor do R1>
+#                   python compare.py --rodada R2_oldpeak --incluir <vencedor do R1> --salvar
+# (o baseline tem a config do vencedor do R1 e é pulado pelo hash: entra por --incluir)
+# =============================================================================
+
+baseline_name: R2_baseline
+
+baseline:
+  zeros: to_nan
+  missing_flags: none
+  imputer: median
+  features: none
+  drop_cols: none
+  encoding: onehot
+  scaler: standard          # ATUALIZAR: vencedor do R1
+  selection: none
+  model: {name: svm}
+
+experiments:
+  - name: R2_zeros_crus
+    override: {zeros: none, imputer: none}
+
+  - name: R2_ausentes
+    sweep:
+      imputer.name: [median, median_by_group]
+      missing_flags.name: [none, flags]
+
+  - name: R2_ausentes_idade
+    override:
+      imputer: {name: median_by_group, group: age_band}
+    sweep:
+      missing_flags.name: [none, flags]
+
+  - name: R2_atalho__sem_colesterol
+    override: {drop_cols: cholesterol}
+
+  - name: R2_atalho__so_flag
+    override: {missing_flags: flags, drop_cols: cholesterol}
+
+  - name: R2_oldpeak
+    sweep:
+      features.name: [none, oldpeak_abs, st_elevation]

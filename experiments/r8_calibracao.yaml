@@ -1,0 +1,39 @@
+# =============================================================================
+# R8 - Probabilidades: calibração
+# -----------------------------------------------------------------------------
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (configuração escolhida no R7) !!!
+#
+# Pergunta: dá para transformar a saída do SVM numa probabilidade confiável de doença?
+# O SVM devolve uma distância à margem, não uma probabilidade: sem calibração, brier e
+# log_loss ficam vazios. Para um uso clínico ("risco de 80%"), a probabilidade precisa
+# corresponder à frequência real.
+#   sigmoid    método de Platt (1999): curva logística sobre a distância. Proposto para o SVM.
+#   isotonic   função em degraus, mais flexível; pode sobreajustar com ~640 pacientes.
+# A calibração usa uma CV interna (só o treino do fold). Se houver limiar (R6), ele é
+# escolhido DEPOIS, sobre a probabilidade calibrada.
+# Critério: brier (menor é melhor). Conferir que o roc_auc praticamente não muda (sigmoid é
+#           monotônica: não muda; isotonic pode mudar um pouco por empates nos degraus).
+#
+# Fechar a rodada:  python compare.py --rodada R8_ --metric brier --salvar
+#                   python compare.py --rodada R8_ --metric roc_auc --incluir <escolha do R7>
+# =============================================================================
+
+baseline_name: R8_baseline
+
+baseline:
+  zeros: to_nan             # ATUALIZAR: configuração escolhida no R7
+  missing_flags: none
+  imputer: median
+  features: none
+  drop_cols: none
+  encoding: onehot
+  scaler: standard
+  selection: none
+  model: {name: svm}
+  # threshold: {name: tuned, scoring: f2}
+  calibration: sigmoid
+
+experiments:
+  - name: R8_calibracao
+    sweep:
+      calibration.name: [sigmoid, isotonic]

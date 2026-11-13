@@ -1,0 +1,35 @@
+# =============================================================================
+# R3 - Kernel
+# -----------------------------------------------------------------------------
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (vencedores do R1 e do R2) !!!
+#
+# Pergunta: a fronteira precisa ser não linear?
+#   linear    hiperplano; equivale a uma regressão logística com perda diferente
+#   rbf       gaussiano: fronteiras curvas e locais (o padrão)
+#   poly      polinomial de grau 3 (interações entre atributos)
+#   sigmoid   parecido com uma rede neural de 1 camada; costuma ser o pior
+# Tudo com os padrões (C = 1, gamma = "scale", degree = 3).
+# Critério: roc_auc. ATENÇÃO: com os padrões, a comparação não é justa (cada kernel tem o seu
+#           melhor C/gamma). O R3 só ELIMINA kernels claramente piores; os que empatam com o
+#           melhor seguem para o R4, que ajusta cada um. A escolha final do kernel é no R4.
+#
+# Fechar a rodada:  python compare.py --rodada R3_ --salvar
+# =============================================================================
+
+baseline_name: R3_baseline
+
+baseline:
+  zeros: to_nan             # ATUALIZAR: vencedor do R2_ausentes
+  missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
+  imputer: median           # ATUALIZAR: vencedor do R2_ausentes
+  features: none            # ATUALIZAR: vencedor do R2_oldpeak
+  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  encoding: onehot
+  scaler: standard          # ATUALIZAR: vencedor do R1
+  selection: none
+  model: {name: svm}
+
+experiments:
+  - name: R3_kernel
+    sweep:
+      model.kernel: [linear, rbf, poly, sigmoid]

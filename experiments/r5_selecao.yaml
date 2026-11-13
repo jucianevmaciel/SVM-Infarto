@@ -1,0 +1,44 @@
+# =============================================================================
+# R5 - Seleção de atributos
+# -----------------------------------------------------------------------------
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (vencedores do R1, R2 e R4) !!!
+#
+# Pergunta: o SVM fica igual ou melhor com menos colunas? Depois do one-hot são ~18 colunas
+#           (6 numéricas + 12 dummies; +1 com a flag do colesterol).
+#   rfe_linear  eliminação recursiva com SVM linear (Guyon et al., 2002): tira a coluna de
+#               menor |coeficiente| até sobrarem n_features
+#   kbest       as k colunas de maior F (ANOVA) com o alvo; filtro, não usa o modelo
+# A seleção acontece DENTRO do fold (só vê o treino do fold).
+# Critério: roc_auc. No empate com "none" (todas as colunas), fica a de MENOS colunas.
+#           Se nenhuma empatar, fica none.
+# Leitura útil para o R9: as colunas que o RFE mantém devem incluir ST_Slope, ChestPainType e
+#           Oldpeak (conhecimento médico).
+#
+# Fechar a rodada:  python compare.py --rodada R5_ --incluir <vencedor do R4> --salvar
+# =============================================================================
+
+baseline_name: R5_baseline
+
+baseline:
+  zeros: to_nan             # ATUALIZAR: vencedor do R2_ausentes
+  missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
+  imputer: median           # ATUALIZAR: vencedor do R2_ausentes
+  features: none            # ATUALIZAR: vencedor do R2_oldpeak
+  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  encoding: onehot
+  scaler: standard          # ATUALIZAR: vencedor do R1
+  selection: none
+  model: {name: svm}        # ATUALIZAR: vencedor do R4 (kernel, C, gamma/degree)
+
+experiments:
+  - name: R5_rfe
+    override:
+      selection: {name: rfe_linear}
+    sweep:
+      selection.n_features: [6, 9, 12, 15]
+
+  - name: R5_kbest
+    override:
+      selection: {name: kbest}
+    sweep:
+      selection.k: [6, 9, 12, 15]

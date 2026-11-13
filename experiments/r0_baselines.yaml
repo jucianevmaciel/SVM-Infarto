@@ -1,0 +1,38 @@
+# =============================================================================
+# R0 - Modelos de referência (baselines)
+# -----------------------------------------------------------------------------
+# Pergunta: o que se consegue sem o SVM? Todo modelo precisa superar o piso.
+# Objetivo: fixar as referências com o MESMO protocolo (mesmo split, mesma CV, mesmo
+#           pré-processamento) do SVM.
+#   dummy     sempre a classe mais frequente do treino (piso: roc_auc 0,5; recall 1 ou 0)
+#   logreg    regressão logística: o "modelo simples", fronteira linear
+#   gboost    gradient boosting: a referência forte sugerida pelo grupo
+# Critério: não há escolha. Servem de comparação no teste final (final_test.py --baselines)
+#           e na discussão: o SVM precisa justificar a complexidade a mais.
+# Pré-processamento de partida (o R1 e o R2 investigam): zeros -> NaN, mediana, one-hot,
+#           padronização das colunas contínuas.
+#
+# Rodar antes das outras rodadas: python run_experiments.py experiments/r0_baselines.yaml
+# =============================================================================
+
+baseline_name: R0_dummy
+
+baseline:
+  zeros: to_nan
+  missing_flags: none
+  imputer: median
+  features: none
+  drop_cols: none
+  encoding: onehot
+  scaler: standard
+  selection: none
+  model: {name: dummy}
+
+experiments:
+  - name: R0_logreg
+    override:
+      model: {name: logreg}
+
+  - name: R0_gboost
+    override:
+      model: {name: gboost}

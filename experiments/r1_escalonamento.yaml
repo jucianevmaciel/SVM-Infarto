@@ -1,0 +1,39 @@
+# =============================================================================
+# R1 - Escalonamento das variáveis contínuas
+# -----------------------------------------------------------------------------
+# Pergunta: quanto a escala atrapalha o SVM? (Cholesterol ~100 a 600, MaxHR ~60 a 200,
+#           Oldpeak ~-2 a 6). O kernel RBF mede distâncias: sem escalonamento, as colunas de
+#           números grandes dominam.
+# Objetivo: fixar o scaler antes das outras rodadas. Hipótese: "none" perde com folga.
+# Critério: roc_auc (recall como segunda leitura). Entre as configs sem diferença
+#           significativa para a melhor, a mais simples: none -> standard -> minmax -> robust.
+# Baseline: SVM com os padrões do scikit-learn (kernel rbf, C = 1, gamma = "scale"). Esse é o
+#           PONTO DE PARTIDA: o R3 e o R4 investigam o kernel e os hiperparâmetros.
+#
+# Lembretes:
+# - Só as contínuas (Age, RestingBP, Cholesterol, MaxHR, Oldpeak) são escalonadas; dummies,
+#   flags e FastingBS já são 0/1.
+# - O scaler fica DENTRO do pipeline: aprende só no treino de cada fold.
+# - scaler=standard no sweep é o próprio baseline e é pulado pelo hash.
+#
+# Fechar a rodada:  python compare.py --rodada R1_ --salvar
+#                   python compare.py --rodada R1_ --metric recall --salvar
+# =============================================================================
+
+baseline_name: R1_baseline
+
+baseline:
+  zeros: to_nan
+  missing_flags: none
+  imputer: median
+  features: none
+  drop_cols: none
+  encoding: onehot
+  scaler: standard
+  selection: none
+  model: {name: svm}
+
+experiments:
+  - name: R1_escalonamento
+    sweep:
+      scaler.name: [none, standard, minmax, robust]

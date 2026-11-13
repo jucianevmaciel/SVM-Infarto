@@ -1,0 +1,61 @@
+# =============================================================================
+# R4 - Hiperparâmetros: C, gamma e grau
+# -----------------------------------------------------------------------------
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (vencedores do R1, R2) E DE TIRAR OS
+#     KERNELS ELIMINADOS NO R3 !!!
+#
+# Pergunta: qual combinação de kernel e hiperparâmetros separa melhor os pacientes?
+#   C       custo de errar no treino. Pequeno = margem larga, aceita erros (modelo simples);
+#           grande = margem estreita, tenta acertar todos (risco de sobreajuste).
+#   gamma   alcance de cada paciente no RBF. Pequeno = fronteira suave; grande = fronteira
+#           recortada em volta de cada ponto. "scale" = 1 / (n_colunas x variância de X).
+#   degree  grau do kernel polinomial.
+# Grade em escala logarítmica (passos de 10x): o efeito de C e gamma é multiplicativo.
+#   R4_rbf      5 C x 5 gamma = 25 execuções  -> mapa de calor (heatmap_c_gamma.py)
+#   R4_linear   5 C
+#   R4_poly     3 graus x 3 C
+# Critério: roc_auc entre TODOS os kernels (é aqui que o kernel é escolhido). Entre as sem
+#           diferença significativa, a mais simples: linear -> rbf -> poly; no mesmo kernel, o
+#           MENOR C (margem mais larga) e, no rbf, o MENOR gamma (fronteira mais suave).
+#           Conferir também a coluna SV (%): muitos vetores de suporte = modelo pouco seletivo.
+#
+# Fechar a rodada:  python compare.py --rodada R4_ --salvar
+#                   python compare.py --rodada R4_ --metric recall --salvar
+#                   python heatmap_c_gamma.py --rodada R4_rbf --incluir <vencedor do R2>
+#                   python heatmap_c_gamma.py --rodada R4_rbf --incluir <vencedor do R2> --metric recall
+# (C=1 e gamma=scale é o baseline, pulado pelo hash: entra por --incluir)
+# =============================================================================
+
+baseline_name: R4_baseline
+
+baseline:
+  zeros: to_nan             # ATUALIZAR: vencedor do R2_ausentes
+  missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
+  imputer: median           # ATUALIZAR: vencedor do R2_ausentes
+  features: none            # ATUALIZAR: vencedor do R2_oldpeak
+  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  encoding: onehot
+  scaler: standard          # ATUALIZAR: vencedor do R1
+  selection: none
+  model: {name: svm}
+
+experiments:
+  - name: R4_rbf
+    override:
+      model: {name: svm, kernel: rbf}
+    sweep:
+      model.C: [0.01, 0.1, 1.0, 10.0, 100.0]
+      model.gamma: [0.001, 0.01, 0.1, 1.0, scale]
+
+  - name: R4_linear
+    override:
+      model: {name: svm, kernel: linear}
+    sweep:
+      model.C: [0.001, 0.01, 0.1, 1.0, 10.0]
+
+  - name: R4_poly
+    override:
+      model: {name: svm, kernel: poly}
+    sweep:
+      model.degree: [2, 3, 4]
+      model.C: [0.1, 1.0, 10.0]
