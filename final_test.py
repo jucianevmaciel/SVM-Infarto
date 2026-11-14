@@ -3,7 +3,7 @@
 Uso:
   python final_test.py --run <pasta do SVM escolhido> [--baselines <pasta R0> <pasta R0> ...]
 
-O split (70_30 ou 80_20) vem do meta.json da execução: o R11 usa este mesmo script na execução
+O split (70_30 ou 80_20) vem do meta.json da execução: o R10 usa este mesmo script na execução
 feita no 80/20. Os baselines precisam ser do MESMO split (o script confere).
 
 Grava em results/final/<run>/: metrics.json, confusion_matrix.csv e .png, roc_curve.png

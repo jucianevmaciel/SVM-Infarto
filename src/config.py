@@ -19,7 +19,7 @@ ROBUSTEZ_DIR = BASE / "results/robustez"
 SEED = 42
 
 # Dois splits treino/teste, gerados uma vez pelo make_split (mesma SEED, estratificados).
-# As rodadas R1-R10 usam o principal (70/30, o mesmo dos trabalhos anteriores). O R11 refaz a
+# As rodadas R1-R9 usam o principal (70/30, o mesmo dos trabalhos anteriores). O R10 refaz a
 # configuração final no 80/20 (análise de sensibilidade: as conclusões se mantêm?).
 SPLITS = {"70_30": 0.30, "80_20": 0.20}
 DEFAULT_SPLIT = "70_30"
@@ -52,7 +52,7 @@ CV = RepeatedStratifiedKFold(n_splits=N_SPLITS, n_repeats=N_REPEATS, random_stat
 def _proba1(est, X):
     """Probabilidade da classe 1, ou None quando o modelo não a fornece.
 
-    O SVC só tem predict_proba com probability=True (ou dentro da calibração do R8). Sem
+    O SVC só tem predict_proba com probability=True (ou dentro da calibração do R7). Sem
     probabilidade, brier e log_loss ficam NaN; o roc_auc usa o decision_function.
     """
     if not hasattr(est, "predict_proba"):

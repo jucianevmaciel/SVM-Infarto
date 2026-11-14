@@ -1,6 +1,6 @@
-"""Mapa de calor C x gamma (R4): média da métrica na CV para cada par, num kernel.
+"""Mapa de calor C x gamma (R3): média da métrica na CV para cada par, num kernel.
 
-Uso: python heatmap_c_gamma.py --rodada R4_rbf [--metric roc_auc] [--kernel rbf] [--incluir <pasta> ...]
+Uso: python heatmap_c_gamma.py --rodada R3_rbf [--metric roc_auc] [--kernel rbf] [--incluir <pasta> ...]
 
 Lê as execuções da rodada (nome começando com o prefixo), pega C e gamma da config (ausentes =
 padrão do SVC: C=1.0, gamma="scale") e grava results/figuras/<rodada>_heatmap_<métrica>.png/.csv.

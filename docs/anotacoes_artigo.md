@@ -1,14 +1,14 @@
 # Anotações para o artigo
 
 Decisões, achados e limitações, registrados ao longo das rodadas. Critérios de leitura que
-dependem de um valor escolhido pelo grupo (ex.: especificidade mínima do R6) são registrados
+dependem de um valor escolhido pelo grupo (ex.: especificidade mínima do R5) são registrados
 ANTES de rodar.
 
 ## Decisões de projeto (antes das rodadas)
 
 - **Alvo:** `HeartDisease` (doença cardíaca), não infarto especificamente.
 - **Splits:** 70/30 estratificado, seed 42, como nos trabalhos anteriores (DecisionTree e
-  RandomForest). O 80/20 é usado só no R11, como análise de sensibilidade (opção B do grupo):
+  RandomForest). O 80/20 é usado só no R10, como análise de sensibilidade (opção B do grupo):
   não escolhe nada, e os dois resultados são reportados.
 - **Validação:** CV estratificada 5 folds x 5 repetições (com ~640 pacientes no treino, um
   único split varia vários pontos só por acaso). Comparação pelo teste t corrigido de Nadeau e
@@ -24,7 +24,7 @@ ANTES de rodar.
 - **Oldpeak negativo:** mantido. É supradesnivelamento do ST, sinal clínico real (inclusive de
   infarto). Remover as linhas mudaria a população e deixaria as comparações desiguais. O R2
   verifica alternativas nos mesmos pacientes.
-- **Desbalanceamento:** pequeno (~55/45); não há rodada de reamostragem. O R6 trata o
+- **Desbalanceamento:** pequeno (~55/45); não há rodada de reamostragem. O R5 trata o
   deslocamento da decisão a favor do recall (peso de classe e limiar).
 
 - **Colesterol ausente não é aleatório (achado da análise exploratória):** Cholesterol = 0 tem
@@ -39,8 +39,8 @@ ANTES de rodar.
 - R2_atalho: (1) se `so_flag` empatar com `median + flag`, o valor do colesterol não ajuda e o
   ganho é da ausência (atalho): achado e limitação. (2) se `sem_colesterol` empatar com o
   vencedor do R2_ausentes, fica sem o colesterol (regra da mais simples). (3) se a flag vencer,
-  conferir no R10 o desempenho no subgrupo "colesterol registrado".
-- R6: especificidade mínima aceitável = ______ (sugestão: 0,70).
+  conferir no R9 o desempenho no subgrupo "colesterol registrado".
+- R5: especificidade mínima aceitável = ______ (sugestão: 0,70).
 
 ## Rodadas
 
@@ -50,32 +50,30 @@ ANTES de rodar.
 
 ### R2 - Zeros e Oldpeak
 
-### R3 - Kernel
+### R3 - Kernel e hiperparâmetros
 
-### R4 - Hiperparâmetros
+### R4 - Seleção de atributos
 
-### R5 - Seleção de atributos
+### R5 - Recall
 
-### R6 - Recall
+### R6 - Combinação e ablação
 
-### R7 - Combinação e ablação
+### R7 - Calibração
 
-### R8 - Calibração
+### R8 - Interpretação (teste de sanidade)
 
-### R9 - Interpretação (teste de sanidade)
-
-### R10 - Robustez
+### R9 - Robustez
 
 ### Teste final (70/30)
 
-### R11 - Split 80/20
+### R10 - Split 80/20
 
 ## Limitações
 
 - **Base combinada de 5 hospitais, sem a coluna de origem:** diferenças entre hospitais (como
   o colesterol não registrado na Suíça) podem virar atalhos. O desempenho em pacientes de um
   hospital novo não é estimado.
-- **Otimismo da seleção:** o R4 testa 40 configurações e escolhe a melhor; a nota de CV do
+- **Otimismo da seleção:** o R3 testa 45 configurações (4 kernels) e escolhe a melhor; a nota de CV do
   vencedor tende a ser um pouco otimista (ele também venceu por acaso entre muitas). A
   estimativa honesta é a do teste final, avaliado uma única vez.
 - **Teste pequeno para alguns casos:** só 1 Oldpeak negativo caiu em cada teste; o efeito

@@ -1,7 +1,7 @@
 # =============================================================================
-# R8 - Probabilidades: calibração
+# R7 - Probabilidades: calibração
 # -----------------------------------------------------------------------------
-# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (configuração escolhida no R7) !!!
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (configuração escolhida no R6) !!!
 #
 # Pergunta: dá para transformar a saída do SVM numa probabilidade confiável de doença?
 # O SVM devolve uma distância à margem, não uma probabilidade: sem calibração, brier e
@@ -9,19 +9,19 @@
 # corresponder à frequência real.
 #   sigmoid    método de Platt (1999): curva logística sobre a distância. Proposto para o SVM.
 #   isotonic   função em degraus, mais flexível; pode sobreajustar com ~640 pacientes.
-# A calibração usa uma CV interna (só o treino do fold). Se houver limiar (R6), ele é
+# A calibração usa uma CV interna (só o treino do fold). Se houver limiar (R5), ele é
 # escolhido DEPOIS, sobre a probabilidade calibrada.
 # Critério: brier (menor é melhor). Conferir que o roc_auc praticamente não muda (sigmoid é
 #           monotônica: não muda; isotonic pode mudar um pouco por empates nos degraus).
 #
-# Fechar a rodada:  python compare.py --rodada R8_ --metric brier --salvar
-#                   python compare.py --rodada R8_ --metric roc_auc --incluir <escolha do R7>
+# Fechar a rodada:  python compare.py --rodada R7_ --metric brier --salvar
+#                   python compare.py --rodada R7_ --metric roc_auc --incluir <escolha do R6>
 # =============================================================================
 
-baseline_name: R8_baseline
+baseline_name: R7_baseline
 
 baseline:
-  zeros: to_nan             # ATUALIZAR: configuração escolhida no R7
+  zeros: to_nan             # ATUALIZAR: configuração escolhida no R6
   missing_flags: none
   imputer: median
   features: none
@@ -34,6 +34,6 @@ baseline:
   calibration: sigmoid
 
 experiments:
-  - name: R8_calibracao
+  - name: R7_calibracao
     sweep:
       calibration.name: [sigmoid, isotonic]

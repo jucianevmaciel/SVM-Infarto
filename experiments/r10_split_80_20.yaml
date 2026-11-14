@@ -1,5 +1,5 @@
 # =============================================================================
-# R11 - Sensibilidade ao split (80/20)
+# R10 - Sensibilidade ao split (80/20)
 # -----------------------------------------------------------------------------
 # !!! RODAR SÓ DEPOIS DO TESTE FINAL NO 70/30 !!!
 #
@@ -10,12 +10,12 @@
 # artigo, e a leitura é se a diferença cabe na variação entre os folds.
 #
 # Rodar e ler:
-#   python run_experiments.py experiments/r11_split_80_20.yaml
-#   python final_test.py --run <R11_svm> --baselines <R11_dummy> <R11_logreg> <R11_gboost>
-#   python split_check.py --run70 <execução final do 70/30> --run80 <R11_svm>
+#   python run_experiments.py experiments/r10_split_80_20.yaml
+#   python final_test.py --run <R10_svm> --baselines <R10_dummy> <R10_logreg> <R10_gboost>
+#   python split_check.py --run70 <execução final do 70/30> --run80 <R10_svm>
 # =============================================================================
 
-baseline_name: R11_svm
+baseline_name: R10_svm
 
 baseline:
   split: "80_20"
@@ -34,9 +34,9 @@ baseline:
 experiments:
   # Baselines do R0 no 80/20, com o pré-processamento da config final (sem limiar e sem
   # calibração: o R0 não tem)
-  - name: R11_dummy
+  - name: R10_dummy
     override: {model: {name: dummy}, threshold: none, calibration: none}
-  - name: R11_logreg
+  - name: R10_logreg
     override: {model: {name: logreg}, threshold: none, calibration: none}
-  - name: R11_gboost
+  - name: R10_gboost
     override: {model: {name: gboost}, threshold: none, calibration: none}

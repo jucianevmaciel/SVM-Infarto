@@ -8,7 +8,7 @@
 # Critério: roc_auc (recall como segunda leitura). Entre as configs sem diferença
 #           significativa para a melhor, a mais simples: none -> standard -> minmax -> robust.
 # Baseline: SVM com os padrões do scikit-learn (kernel rbf, C = 1, gamma = "scale"). Esse é o
-#           PONTO DE PARTIDA: o R3 e o R4 investigam o kernel e os hiperparâmetros.
+#           PONTO DE PARTIDA: o R3 investiga o kernel e os hiperparâmetros.
 #
 # Lembretes:
 # - Só as contínuas (Age, RestingBP, Cholesterol, MaxHR, Oldpeak) são escalonadas; dummies,

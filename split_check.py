@@ -1,13 +1,13 @@
-"""R11 - O resultado final muda com o split? (70/30 x 80/20)
+"""R10 - O resultado final muda com o split? (70/30 x 80/20)
 
 Uso: python split_check.py --run70 <pasta> --run80 <pasta>
 
-As duas execuções devem ter a MESMA config (o r11_split_80_20.yaml repete a config final com
+As duas execuções devem ter a MESMA config (o r10_split_80_20.yaml repete a config final com
 split: 80_20). Mostra lado a lado a CV de cada split e, se o final_test.py já foi rodado nas
 duas, o teste. As notas NÃO são comparadas por teste t (treinos e folds diferentes): a leitura é
 se a diferença entre os splits cabe na variação entre os folds (o desvio da CV).
 
-Grava results/comparacoes/R11_splits.csv.
+Grava results/comparacoes/R10_splits.csv.
 """
 import argparse
 import json
@@ -64,13 +64,13 @@ def main():
         rows.append(r)
     table = pd.DataFrame(rows)
     COMPARACOES_DIR.mkdir(parents=True, exist_ok=True)
-    table.to_csv(COMPARACOES_DIR / "R11_splits.csv", index=False)
+    table.to_csv(COMPARACOES_DIR / "R10_splits.csv", index=False)
     with pd.option_context("display.width", 220):
         print(table.to_string(index=False, float_format="%.3f"))
     print(f"\nTreino: {m70['n_train']} (70/30) x {m80['n_train']} (80/20) pacientes")
     if not (t70 and t80):
         print("Teste: rode o final_test.py nas duas execuções para ver as colunas de teste.")
-    print(f"-> {COMPARACOES_DIR / 'R11_splits.csv'}")
+    print(f"-> {COMPARACOES_DIR / 'R10_splits.csv'}")
 
 
 if __name__ == "__main__":

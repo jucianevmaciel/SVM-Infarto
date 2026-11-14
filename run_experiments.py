@@ -25,7 +25,7 @@ def _fmt(value):
 
 
 def expand_sweep(name, cfg, sweep):
-    """{model.C: [0.1, 1]} -> um experimento por combinação: R4__C=0.1."""
+    """{model.C: [0.1, 1]} -> um experimento por combinação: R3__C=0.1."""
     if not sweep:
         return [(name, cfg)]
     keys = list(sweep)

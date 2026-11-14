@@ -1,4 +1,4 @@
-"""R10 - Robustez da configuração escolhida (só no treino, sem tocar no teste).
+"""R9 - Robustez da configuração escolhida (só no treino, sem tocar no teste).
 
 Uso: python robustez.py --run <pasta do vencedor> [--seeds 1 7 13 99 2024]
 

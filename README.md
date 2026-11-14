@@ -21,8 +21,8 @@ O `make_split` gera os dois splits (estratificados, seed 42) e mostra os problem
 
 | Split | Uso |
 |---|---|
-| `data/split/70_30/` | **principal**: todas as rodadas (R0-R10) e o teste final |
-| `data/split/80_20/` | **só o R11**: a config final é refeita aqui para ver se o resultado muda |
+| `data/split/70_30/` | **principal**: todas as rodadas (R0-R9) e o teste final |
+| `data/split/80_20/` | **só o R10**: a config final é refeita aqui para ver se o resultado muda |
 
 O 80/20 não escolhe nada. Escolher o split pelo melhor teste seria usar o teste para decidir.
 
@@ -66,10 +66,10 @@ Toda execução passa pelas mesmas etapas, nesta ordem. Cada uma recebe uma opç
 | `drop_cols` | **none**, cholesterol | tira a coluna Cholesterol (R2_atalho; a flag, se houver, fica) |
 | `encoding` | **onehot** | categóricas viram colunas 0/1 (obrigatória) |
 | `scaler` | none, **standard**, minmax, robust | só nas contínuas (Age, RestingBP, Cholesterol, MaxHR, Oldpeak) |
-| `selection` | **none**, rfe_linear, kbest | seleção de colunas (R5) |
+| `selection` | **none**, rfe_linear, kbest | seleção de colunas (R4) |
 | `model` | **svm**, logreg, gboost, dummy | com os hiperparâmetros no YAML |
-| `calibration` (opcional) | sigmoid, isotonic | probabilidades (R8) |
-| `threshold` (opcional) | tuned (scoring: f1, f2, balanced_accuracy) | limiar de decisão (R6) |
+| `calibration` (opcional) | sigmoid, isotonic | probabilidades (R7) |
+| `threshold` (opcional) | tuned (scoring: f1, f2, balanced_accuracy) | limiar de decisão (R5) |
 
 Em negrito, o ponto de partida. Exemplo de config:
 
@@ -97,23 +97,22 @@ gera 6. O `override` **substitui a etapa inteira** (para mudar só o C, repita o
 | R0 | O que se consegue sem o SVM? (dummy, regressão logística, gradient boosting) | `r0_baselines.yaml` |
 | R1 | Escalonar importa? | `r1_escalonamento.yaml` |
 | R2 | Como tratar os zeros? A flag é um atalho? E o Oldpeak negativo? | `r2_dados.yaml` |
-| R3 | Qual kernel? (só elimina os piores) | `r3_kernel.yaml` |
-| R4 | C x gamma, grau; escolha final do kernel | `r4_hiperparametros.yaml` + `heatmap_c_gamma.py` |
-| R5 | Menos colunas ajuda? | `r5_selecao.yaml` |
-| R6 | Como subir o recall? (peso de classe, limiar) | `r6_recall.yaml` |
-| R7 | Tudo junto + ablação + reajuste de C/gamma | `r7_combinacao.yaml` |
-| R8 | Probabilidades calibradas | `r8_calibracao.yaml` |
-| R9 | O que o modelo usa? (teste de sanidade) | `importances_permutation.csv` e `coeficientes_lineares.csv` da execução |
-| R10 | Robustez: outras sementes da CV e subgrupos | `robustez.py --run <vencedor>` |
+| R3 | Qual kernel e qual ajuste? (C, gamma, grau; 4 kernels já ajustados) | `r3_kernel_hiperparametros.yaml` + `heatmap_c_gamma.py` |
+| R4 | Menos colunas ajuda? | `r4_selecao.yaml` |
+| R5 | Como subir o recall? (peso de classe, limiar) | `r5_recall.yaml` |
+| R6 | Tudo junto + ablação + reajuste de C/gamma | `r6_combinacao.yaml` |
+| R7 | Probabilidades calibradas | `r7_calibracao.yaml` |
+| R8 | O que o modelo usa? (teste de sanidade) | `importances_permutation.csv` e `coeficientes_lineares.csv` da execução |
+| R9 | Robustez: outras sementes da CV e subgrupos | `robustez.py --run <vencedor>` |
 | Final | Vencedor e baselines no teste 70/30 | `final_test.py --run <vencedor> --baselines ...` |
-| R11 | O resultado muda no 80/20? | `r11_split_80_20.yaml` + `final_test.py` + `split_check.py` |
+| R10 | O resultado muda no 80/20? | `r10_split_80_20.yaml` + `final_test.py` + `split_check.py` |
 
 **R2, o atalho do colesterol:** Cholesterol = 0 tem 88% de doentes, contra 48% nos
 registrados, porque os zeros vêm quase todos de um hospital (Suíça). Uma flag de ausência pode
 subir o roc_auc ensinando "veio daquele hospital". O `R2_atalho` separa os efeitos (sem a
 coluna; só a flag) e a regra de leitura está no YAML e em `docs/anotacoes_artigo.md`.
 
-**R9, teste de sanidade:** na literatura e na cardiologia, ST_Slope, ChestPainType e Oldpeak
+**R8, teste de sanidade:** na literatura e na cardiologia, ST_Slope, ChestPainType e Oldpeak
 são os sinais mais fortes nesta base. Se as importâncias da execução escolhida não se parecerem
 com isso, procure vazamento ou erro de codificação antes de seguir.
 

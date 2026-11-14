@@ -17,16 +17,16 @@ Todos rodam a partir da raiz, com o `.venv`:
 pip install -r requirements.txt
 python -m src.make_split                                             # data/raw/heart.csv -> data/split/70_30 e 80_20 (uma vez)
 python run_experiments.py experiments/r0_baselines.yaml              # uma rodada
-python run_experiments.py experiments/r4_hiperparametros.yaml --only R4_linear   # um experimento (ou um sweep inteiro)
+python run_experiments.py experiments/r3_kernel_hiperparametros.yaml --only R3_linear   # um experimento (ou um sweep inteiro)
 python run_experiments.py experiments/r1_escalonamento.yaml --force  # repete, cria pasta nova
 python summarize.py [--metric recall] [--split 70_30]                # regenera results/summary.csv
 python compare.py <run_A> <run_B> [--metric roc_auc]                 # teste t corrigido (Nadeau-Bengio) fold a fold
 python compare.py --rodada R1_ [--metric roc_auc|recall|brier] [--ref <pasta>] [--incluir <pasta> ...] [--salvar]
-python heatmap_c_gamma.py --rodada R4_rbf [--incluir <pasta>] [--metric recall]
-python robustez.py --run <pasta>                                     # R10 (só treino)
+python heatmap_c_gamma.py --rodada R3_rbf [--incluir <pasta>] [--metric recall]
+python robustez.py --run <pasta>                                     # R9 (só treino)
 python fronteira_2d.py --run <pasta> [--C ...] [--gamma ...]         # figura didática (PCA 2D, só treino)
 python final_test.py --run <pasta> [--baselines <pasta R0> ...]      # teste final, uma vez
-python split_check.py --run70 <pasta> --run80 <pasta>                # R11
+python split_check.py --run70 <pasta> --run80 <pasta>                # R10
 ```
 
 Não há testes, linter nem build. Para validar uma mudança, rode os experimentos afetados com
@@ -50,7 +50,7 @@ O fluxo é YAML → `resolve` → `build_pipeline` → `cross_validate` → past
   `80_20` sem aspas como o número 8020: o `resolve` aceita as duas formas.
 - **Model:** `{name: svm | logreg | gboost | dummy, **hiperparâmetros}` (sem `name`, vale `svm`).
   O SVC fica com `probability=False`: o `roc_auc` usa o `decision_function`; `brier` e
-  `log_loss` são NaN até a calibração (R8). O `compare.py` pula execuções sem a métrica.
+  `log_loss` são NaN até a calibração (R7). O `compare.py` pula execuções sem a métrica.
 - **Normalização da config (`src/builder.py:resolve`):** baseline + override (o override
   **substitui a etapa inteira**, inclusive `model`); parâmetros do model iguais ao padrão da
   fábrica são removidos (mesmo modelo = mesmo hash); opcionais com `none` e `split: 70_30` saem.
@@ -83,16 +83,15 @@ Todas no split 70/30, CV 5x5 estratificada (`SEED=42`).
 | `r0_baselines.yaml` | dummy, logreg, gboost | não há escolha |
 | `r1_escalonamento.yaml` | `scaler` | roc_auc; none → standard → minmax → robust |
 | `r2_dados.yaml` | `R2_ausentes` (imputer median/median_by_group/knn_scaled/iterative x flag; zeros crus), `R2_atalho` (`drop_cols`: sem a coluna / só a flag) e `R2_oldpeak` (`features`) | roc_auc; fechadas separadamente; regra de leitura do atalho no YAML |
-| `r3_kernel.yaml` | kernel com os padrões | só elimina os claramente piores |
-| `r4_hiperparametros.yaml` | C x gamma (rbf), C (linear), grau x C (poly) | roc_auc; escolhe o kernel; menor C/gamma no empate |
-| `r5_selecao.yaml` | `rfe_linear` / `kbest` | roc_auc; menos colunas no empate |
-| `r6_recall.yaml` | `class_weight` e `threshold: tuned` (f1, f2, balanced_accuracy) | recall com especificidade mínima (registrar antes) |
-| `r7_combinacao.yaml` | ablação + reajuste de C/gamma | roc_auc e recall contra a combinação |
-| `r8_calibracao.yaml` | sigmoid x isotonic | brier |
-| R9 (sem YAML) | importâncias e coeficientes: ST_Slope, ChestPainType, Oldpeak no topo? | teste de sanidade |
-| R10 (`robustez.py`) | outras sementes da CV e subgrupos (Sex, colesterol ausente, idade) | — |
+| `r3_kernel_hiperparametros.yaml` | 4 kernels já ajustados: C x gamma (rbf), C (linear), grau x C (poly), C x gamma (sigmoid) | roc_auc; escolhe o kernel; linear → rbf → poly → sigmoid, menor C/gamma no empate |
+| `r4_selecao.yaml` | `rfe_linear` / `kbest` | roc_auc; menos colunas no empate |
+| `r5_recall.yaml` | `class_weight` e `threshold: tuned` (f1, f2, balanced_accuracy) | recall com especificidade mínima (registrar antes) |
+| `r6_combinacao.yaml` | ablação + reajuste de C/gamma | roc_auc e recall contra a combinação |
+| `r7_calibracao.yaml` | sigmoid x isotonic | brier |
+| R8 (sem YAML) | importâncias e coeficientes: ST_Slope, ChestPainType, Oldpeak no topo? | teste de sanidade |
+| R9 (`robustez.py`) | outras sementes da CV e subgrupos (Sex, colesterol ausente, idade) | — |
 | teste final (`final_test.py`) | vencedor + baselines no teste 70/30 | — |
-| `r11_split_80_20.yaml` | config final + baselines no 80/20 (`split_check.py`) | análise de sensibilidade |
+| `r10_split_80_20.yaml` | config final + baselines no 80/20 (`split_check.py`) | análise de sensibilidade |
 
 - Linhas com `# ATUALIZAR: vencedor de Rx` são provisórias e devem ser trocadas pelo usuário
   antes de rodar. Não preencha vencedores por conta própria.

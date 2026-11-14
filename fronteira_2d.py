@@ -86,11 +86,20 @@ def main():
     xx, yy = np.meshgrid(np.linspace(P[:, 0].min() - pad, P[:, 0].max() + pad, 300),
                          np.linspace(P[:, 1].min() - pad, P[:, 1].max() + pad, 300))
     grid = np.c_[xx.ravel(), yy.ravel()]
-    fig, axes = plt.subplots(len(gammas), len(Cs), squeeze=False,
-                             figsize=(4.6 * len(Cs), 4.2 * len(gammas)))
+    # Só um dos dois variando: painéis lado a lado. Os dois: grade (linhas = gamma, colunas = C).
+    if len(Cs) == 1 and len(gammas) > 1:
+        layout = [[(0, j) for j in range(len(gammas))]]
+        pairs = {(0, j): (Cs[0], gammas[j]) for j in range(len(gammas))}
+    else:
+        layout = [[(i, j) for j in range(len(Cs))] for i in range(len(gammas))]
+        pairs = {(i, j): (Cs[j], gammas[i]) for i in range(len(gammas)) for j in range(len(Cs))}
+    nrows, ncols = len(layout), len(layout[0])
+    fig, axes = plt.subplots(nrows, ncols, squeeze=False,
+                             figsize=(max(4.6 * ncols, 9), 4.2 * nrows))
     colors = np.where(y.to_numpy() == 1, "#C44E52", "#4C72B0")
-    for i, g in enumerate(gammas):
-        for j, c in enumerate(Cs):
+    for i in range(nrows):
+        for j in range(ncols):
+            c, g = pairs[(i, j)]
             params = {k: v for k, v in model_cfg.items() if k not in ("C", "gamma")}
             svm = SVC(C=c, gamma=g, random_state=SEED, **params).fit(P, y)
             D = svm.decision_function(grid).reshape(xx.shape)
@@ -112,7 +121,7 @@ def main():
             ax.set_yticks([])
             if j == 0:
                 ax.set_ylabel(f"PC2 ({var[1]:.0%} da variância)")
-            if i == len(gammas) - 1:
+            if i == nrows - 1:
                 ax.set_xlabel(f"PC1 ({var[0]:.0%} da variância)")
     fig.suptitle("SVM projetado em 2 componentes principais (ilustração; só o treino)\n"
                  "azul = sem doença, vermelho = com doença; contorno preto = vetor de suporte",

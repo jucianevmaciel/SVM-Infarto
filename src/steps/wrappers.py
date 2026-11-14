@@ -1,7 +1,7 @@
 """Etapas opcionais que envolvem o pipeline inteiro, nesta ordem:
 
-1. calibration: transforma a saída do SVM em probabilidade (CalibratedClassifierCV) - R8;
-2. threshold: escolhe o limiar de decisão (TunedThresholdClassifierCV) - R6.
+1. calibration: transforma a saída do SVM em probabilidade (CalibratedClassifierCV) - R7;
+2. threshold: escolhe o limiar de decisão (TunedThresholdClassifierCV) - R5.
 
 As duas usam um CV interno feito só com o treino recebido (o fold de treino, na CV externa).
 """

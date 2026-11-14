@@ -30,7 +30,7 @@
 #       é a ausência (atalho). Reportar como achado e limitação.
 #     - sem_colesterol empata com o vencedor do R2_ausentes -> pela regra da mais simples,
 #       fica sem o colesterol (menos colunas, sem depender do atalho).
-#     - se a flag vencer o R2_ausentes, conferir no robustez.py (R10) se o desempenho se
+#     - se a flag vencer o R2_ausentes, conferir no robustez.py (R9) se o desempenho se
 #       mantém no subgrupo "colesterol registrado". Se cair, o ganho era o atalho.
 #   Fechar: python compare.py --rodada R2_atalho --incluir <R2_ausentes__imputer=median_missing_flags=flags>
 #           <vencedor do R2_ausentes> --salvar   (as pastas, em results/runs/)

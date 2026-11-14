@@ -1,7 +1,7 @@
 """Prepara os dados: lê data/raw/heart.csv e gera os dois splits em data/split/.
 
-  data/split/70_30/train.csv, test.csv   principal (R0-R10 e teste final)
-  data/split/80_20/train.csv, test.csv   análise de sensibilidade (R11)
+  data/split/70_30/train.csv, test.csv   principal (R0-R9 e teste final)
+  data/split/80_20/train.csv, test.csv   análise de sensibilidade (R10)
 
 Preparação (feita ANTES de dividir):
   1. confere as colunas esperadas;

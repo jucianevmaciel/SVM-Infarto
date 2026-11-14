@@ -1,0 +1,77 @@
+# =============================================================================
+# R3 - Kernel e hiperparâmetros: C, gamma e grau
+# -----------------------------------------------------------------------------
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (vencedores do R1 e do R2) !!!
+#
+# Pergunta: qual formato de fronteira (kernel) e qual ajuste separam melhor os pacientes?
+# Os quatro kernels são testados JÁ AJUSTADOS, cada um com a sua grade: comparar kernels só
+# com os valores padrão não seria justo (um kernel pode perder só por estar mal regulado).
+#   C       custo de errar no treino. Pequeno = margem larga, aceita erros (modelo simples);
+#           grande = margem estreita, tenta acertar todos (risco de sobreajuste).
+#   gamma   alcance de cada paciente no RBF (e no sigmoide). Pequeno = fronteira suave;
+#           grande = fronteira recortada em volta de cada ponto.
+#           "scale" = escolha automática do scikit-learn: 1 / (n_colunas x variância de X).
+#   degree  grau do kernel polinomial.
+#   O kernel linear não usa gamma: só o C.
+# Grade em escala logarítmica (passos de 10x): o efeito de C e gamma é multiplicativo.
+#   R3_rbf       5 C x 5 gamma = 25 execuções  -> mapa de calor (heatmap_c_gamma.py)
+#   R3_linear    5 C
+#   R3_poly      3 graus x 3 C = 9
+#   R3_sigmoid   3 C x 2 gamma = 6 (costuma ser o pior; entra para a comparação ficar completa)
+#   Total: 45 execuções (a R3_rbf com C=1 e gamma=scale é o próprio baseline).
+# Critério: roc_auc entre TODOS os kernels (é aqui que o kernel é escolhido); recall como
+#           segunda leitura. Entre as sem diferença significativa, a mais simples:
+#           linear -> rbf -> poly -> sigmoid; no mesmo kernel, o MENOR C (margem mais larga)
+#           e, no rbf, o MENOR gamma (fronteira mais suave).
+#           Conferir também a coluna SV (%): muitos vetores de suporte = modelo pouco seletivo.
+#           Se o melhor cair na PONTA de uma grade (ex.: C=100), acrescentar um valor naquela
+#           direção antes de fechar a rodada.
+#
+# Fechar a rodada:  python compare.py --rodada R3_ --incluir <vencedor do R2> --salvar
+#                   python compare.py --rodada R3_ --incluir <vencedor do R2> --metric recall --salvar
+#                   python heatmap_c_gamma.py --rodada R3_rbf --incluir <vencedor do R2>
+#                   python heatmap_c_gamma.py --rodada R3_rbf --incluir <vencedor do R2> --metric recall
+# (C=1 e gamma=scale com rbf é o baseline, igual ao vencedor do R2: pulado pelo hash, entra
+#  por --incluir)
+# =============================================================================
+
+baseline_name: R3_baseline
+
+baseline:
+  zeros: to_nan             # ATUALIZAR: vencedor do R2_ausentes
+  missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
+  imputer: median           # ATUALIZAR: vencedor do R2_ausentes
+  features: none            # ATUALIZAR: vencedor do R2_oldpeak
+  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  encoding: onehot
+  scaler: standard          # ATUALIZAR: vencedor do R1
+  selection: none
+  model: {name: svm}
+
+experiments:
+  - name: R3_rbf
+    override:
+      model: {name: svm, kernel: rbf}
+    sweep:
+      model.C: [0.01, 0.1, 1.0, 10.0, 100.0]
+      model.gamma: [0.001, 0.01, 0.1, 1.0, scale]
+
+  - name: R3_linear
+    override:
+      model: {name: svm, kernel: linear}
+    sweep:
+      model.C: [0.001, 0.01, 0.1, 1.0, 10.0]
+
+  - name: R3_poly
+    override:
+      model: {name: svm, kernel: poly}
+    sweep:
+      model.degree: [2, 3, 4]
+      model.C: [0.1, 1.0, 10.0]
+
+  - name: R3_sigmoid
+    override:
+      model: {name: svm, kernel: sigmoid}
+    sweep:
+      model.C: [0.1, 1.0, 10.0]
+      model.gamma: [0.01, scale]

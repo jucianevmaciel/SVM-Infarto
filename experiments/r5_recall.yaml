@@ -1,13 +1,13 @@
 # =============================================================================
-# R6 - Priorizar o recall (o falso negativo é o erro mais caro)
+# R5 - Priorizar o recall (o falso negativo é o erro mais caro)
 # -----------------------------------------------------------------------------
-# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (vencedores do R1 ao R5) !!!
+# !!! NÃO RODAR ANTES DE ATUALIZAR O BASELINE (vencedores do R1 ao R4) !!!
 #
 # Pergunta: quanto recall se ganha, e a que custo de especificidade?
 # As classes estão quase balanceadas (~55/45): aqui o objetivo não é "balancear", é deslocar
 # a decisão a favor de achar os doentes.
-#   R6_peso     class_weight: balanced (erro na classe menor custa mais no treino do SVM)
-#   R6_limiar   limiar de decisão escolhido por CV interna (TunedThresholdClassifierCV),
+#   R5_peso     class_weight: balanced (erro na classe menor custa mais no treino do SVM)
+#   R5_limiar   limiar de decisão escolhido por CV interna (TunedThresholdClassifierCV),
 #               maximizando:
 #                 f1                 equilíbrio precisão x recall
 #                 f2                 recall pesa 4x mais que a precisão
@@ -17,11 +17,11 @@
 # Critério (REGISTRAR NO docs/anotacoes_artigo.md ANTES DE RODAR): maior recall, desde que a
 #           especificidade não caia abaixo do limite combinado pelo grupo (sugestão: 0,70).
 #
-# Fechar a rodada:  python compare.py --rodada R6_ --metric recall --incluir <vencedor do R5> --salvar
-#                   python compare.py --rodada R6_ --metric specificity --incluir <vencedor do R5> --salvar
+# Fechar a rodada:  python compare.py --rodada R5_ --metric recall --incluir <vencedor do R4> --salvar
+#                   python compare.py --rodada R5_ --metric specificity --incluir <vencedor do R4> --salvar
 # =============================================================================
 
-baseline_name: R6_baseline
+baseline_name: R5_baseline
 
 baseline:
   zeros: to_nan             # ATUALIZAR: vencedor do R2_ausentes
@@ -31,16 +31,16 @@ baseline:
   drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
   encoding: onehot
   scaler: standard          # ATUALIZAR: vencedor do R1
-  selection: none           # ATUALIZAR: vencedor do R5
-  model: {name: svm}        # ATUALIZAR: vencedor do R4
+  selection: none           # ATUALIZAR: vencedor do R4
+  model: {name: svm}        # ATUALIZAR: vencedor do R3
 
 experiments:
-  # O override substitui o model inteiro: repetir o vencedor do R4 + class_weight
-  - name: R6_peso
+  # O override substitui o model inteiro: repetir o vencedor do R3 + class_weight
+  - name: R5_peso
     override:
-      model: {name: svm, class_weight: balanced}   # ATUALIZAR: vencedor do R4 + class_weight
+      model: {name: svm, class_weight: balanced}   # ATUALIZAR: vencedor do R3 + class_weight
 
-  - name: R6_limiar
+  - name: R5_limiar
     override:
       threshold: {name: tuned}
     sweep:

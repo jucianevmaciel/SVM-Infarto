@@ -4,7 +4,7 @@ Os parâmetros escritos no YAML vão direto para o construtor. Parâmetros iguai
 fábrica saem da config (mesmo modelo = mesmo hash; ver builder.normalize_model).
 
   svm      SVC (kernel rbf, C=1, gamma="scale" no padrão do scikit-learn). Sem predict_proba:
-           o roc_auc usa o decision_function; probabilidades só com a calibração (R8).
+           o roc_auc usa o decision_function; probabilidades só com a calibração (R7).
   logreg   regressão logística: o "modelo simples" (fronteira linear)
   gboost   gradient boosting: a referência forte sugerida pelo grupo
   dummy    sempre a classe mais frequente do treino (piso)

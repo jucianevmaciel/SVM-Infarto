@@ -1,4 +1,4 @@
-"""Etapa 8 (selection): seleção de atributos (R5). Atua nas colunas já codificadas e escalonadas.
+"""Etapa 8 (selection): seleção de atributos (R4). Atua nas colunas já codificadas e escalonadas.
 
   rfe_linear  eliminação recursiva com um SVM linear: tira, a cada passo, a coluna de menor
               |coeficiente|, até sobrarem n_features (Guyon et al., 2002, a proposta original
