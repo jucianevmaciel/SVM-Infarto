@@ -10,11 +10,15 @@
 #   R2_ausentes         imputador x flag Cholesterol_missing ("was_missing")
 #                         median            mediana da coluna (o baseline)
 #                         median_by_group   mediana por Sex
+#                         knn_scaled        média dos 5 pacientes mais parecidos (exames numéricos
+#                                           padronizados) que têm o valor
+#                         iterative         MICE: regressão prevê o colesterol pelos outros exames
 #   R2_ausentes_idade   mediana por faixa de idade (<45, 45-55, 55-65, >65), com e sem flag
-#   (knn_scaled fica disponível; entra se o grupo quiser um imputador "sofisticado")
+#   Hipótese: o colesterol se correlaciona pouco com os outros exames, então knn e iterative
+#   devem ficar perto da mediana. Se empatarem, isso é um resultado ("o simples basta").
 #   Nunca agrupar pelo alvo HeartDisease: vazaria o rótulo para o atributo.
-#   Critério: roc_auc. A mais simples no empate: median -> median_by_group -> knn; sem flag
-#             antes de com flag.
+#   Critério: roc_auc. A mais simples no empate: median -> median_by_group -> knn_scaled ->
+#             iterative; sem flag antes de com flag.
 #
 # R2_atalho - O ganho da flag vem do colesterol ou do hospital de origem?
 #   Na base, Cholesterol = 0 tem 88% de doentes; registrado, 48%. Os zeros vêm quase todos da
@@ -63,7 +67,7 @@ experiments:
 
   - name: R2_ausentes
     sweep:
-      imputer.name: [median, median_by_group]
+      imputer.name: [median, median_by_group, knn_scaled, iterative]
       missing_flags.name: [none, flags]
 
   - name: R2_ausentes_idade

@@ -82,7 +82,7 @@ Todas no split 70/30, CV 5x5 estratificada (`SEED=42`).
 |---|---|---|
 | `r0_baselines.yaml` | dummy, logreg, gboost | não há escolha |
 | `r1_escalonamento.yaml` | `scaler` | roc_auc; none → standard → minmax → robust |
-| `r2_dados.yaml` | `R2_ausentes` (imputer x flag; zeros crus), `R2_atalho` (`drop_cols`: sem a coluna / só a flag) e `R2_oldpeak` (`features`) | roc_auc; fechadas separadamente; regra de leitura do atalho no YAML |
+| `r2_dados.yaml` | `R2_ausentes` (imputer median/median_by_group/knn_scaled/iterative x flag; zeros crus), `R2_atalho` (`drop_cols`: sem a coluna / só a flag) e `R2_oldpeak` (`features`) | roc_auc; fechadas separadamente; regra de leitura do atalho no YAML |
 | `r3_kernel.yaml` | kernel com os padrões | só elimina os claramente piores |
 | `r4_hiperparametros.yaml` | C x gamma (rbf), C (linear), grau x C (poly) | roc_auc; escolhe o kernel; menor C/gamma no empate |
 | `r5_selecao.yaml` | `rfe_linear` / `kbest` | roc_auc; menos colunas no empate |

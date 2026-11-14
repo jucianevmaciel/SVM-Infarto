@@ -26,6 +26,7 @@ REGISTRY = {
         "median": imputers.median,
         "median_by_group": imputers.median_by_group,
         "knn_scaled": imputers.knn_scaled,
+        "iterative": imputers.iterative,
     },
     "features": {
         "none": None,

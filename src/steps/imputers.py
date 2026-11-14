@@ -6,15 +6,19 @@ Todos aprendem os valores no fit (treino do fold) e só aplicam no transform (an
                   NUNCA agrupar pelo alvo HeartDisease: o rótulo vazaria para dentro do atributo.
   knn_scaled      k vizinhos mais próximos, com as colunas numéricas padronizadas para medir a
                   distância (senão Cholesterol e MaxHR dominam)
+  iterative       imputação iterativa (MICE): uma regressão prevê cada coluna com ausentes a
+                  partir das outras numéricas, repetindo até estabilizar
+Ordem de simplicidade (desempate): median -> median_by_group -> knn_scaled -> iterative.
 O SVM não aceita NaN: com zeros: to_nan, algum imputer é obrigatório (o builder confere).
 """
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.impute import KNNImputer
+from sklearn.experimental import enable_iterative_imputer  # noqa: F401  (habilita o IterativeImputer)
+from sklearn.impute import IterativeImputer, KNNImputer
 from sklearn.preprocessing import StandardScaler
 
-from src.config import NUM_COLS
+from src.config import NUM_COLS, SEED
 
 AGE_BINS = [-np.inf, 45, 55, 65, np.inf]
 
@@ -90,6 +94,31 @@ class KNNScaledImputer(BaseEstimator, TransformerMixin):
         return X
 
 
+class IterativeNumImputer(BaseEstimator, TransformerMixin):
+    """MICE nas colunas numéricas: cada coluna com ausentes é prevista por uma regressão linear
+    bayesiana (BayesianRidge) a partir das outras, em rodadas, até estabilizar. Só as células
+    ausentes são trocadas. Usa só as numéricas (as categóricas ainda são texto nesta etapa)."""
+
+    def __init__(self, max_iter=10):
+        self.max_iter = max_iter
+
+    def fit(self, X, y=None):
+        self.imp_ = (IterativeImputer(max_iter=self.max_iter, random_state=SEED,
+                                      keep_empty_features=True)
+                     .set_output(transform="default").fit(X[_num_cols(X)]))
+        return self
+
+    def transform(self, X):
+        X = X.copy()
+        cols = _num_cols(X)
+        num = X[cols]
+        out = num.to_numpy(dtype=float, copy=True)
+        mask = num.isna().to_numpy()
+        out[mask] = self.imp_.transform(num)[mask]
+        X[cols] = out
+        return X
+
+
 def median():
     return MedianImputer()
 
@@ -100,3 +129,7 @@ def median_by_group(group="Sex"):
 
 def knn_scaled(n_neighbors=5):
     return KNNScaledImputer(n_neighbors)
+
+
+def iterative(max_iter=10):
+    return IterativeNumImputer(max_iter)

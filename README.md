@@ -61,7 +61,7 @@ Toda execução passa pelas mesmas etapas, nesta ordem. Cada uma recebe uma opç
 |---|---|---|
 | `zeros` | none, **to_nan** | Cholesterol = 0 (~19%) e RestingBP = 0 (1) viram ausentes |
 | `missing_flags` | **none**, flags | acrescenta `Cholesterol_missing` ("was_missing") |
-| `imputer` | **median**, median_by_group, knn_scaled, none | preenche os ausentes. Grupo: `Sex` ou `age_band`, nunca o alvo |
+| `imputer` | **median**, median_by_group, knn_scaled, iterative, none | preenche os ausentes (iterative = MICE). Grupo: `Sex` ou `age_band`, nunca o alvo |
 | `features` | **none**, oldpeak_abs, st_elevation | Oldpeak negativo (R2) |
 | `drop_cols` | **none**, cholesterol | tira a coluna Cholesterol (R2_atalho; a flag, se houver, fica) |
 | `encoding` | **onehot** | categóricas viram colunas 0/1 (obrigatória) |
