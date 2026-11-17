@@ -1,0 +1,19 @@
+name: R2_oldpeak__features=oldpeak_abs
+zeros:
+  name: to_nan
+missing_flags:
+  name: none
+imputer:
+  name: median
+features:
+  name: oldpeak_abs
+drop_cols:
+  name: none
+encoding:
+  name: onehot
+scaler:
+  name: standard
+selection:
+  name: none
+model:
+  name: svm

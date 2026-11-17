@@ -1,0 +1,18 @@
+{
+  "run_id": "20261116_191309_7a7e26_R2_atalho__sem_fastingbs",
+  "name": "R2_atalho__sem_fastingbs",
+  "hash": "7a7e26433dcc0598881b1d57b5a8cae2b0ce353ab6f483d585a6a7fddf1ecf22",
+  "date": "2026-11-16T19:13:09",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 16.22,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

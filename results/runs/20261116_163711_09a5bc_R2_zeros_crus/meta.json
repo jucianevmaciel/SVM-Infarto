@@ -1,0 +1,18 @@
+{
+  "run_id": "20261116_163711_09a5bc_R2_zeros_crus",
+  "name": "R2_zeros_crus",
+  "hash": "09a5bc33fda59a0062eb6831785da4ae03cd94e3b979077cd062f84b928e090d",
+  "date": "2026-11-16T16:37:11",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 12.33,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

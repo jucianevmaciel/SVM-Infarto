@@ -1,0 +1,18 @@
+{
+  "run_id": "20261117_162127_e3df82_R6_reajuste_C0.03",
+  "name": "R6_reajuste_C0.03",
+  "hash": "e3df82c7ddcd1c70885f5b2377f9b5429a24f067c639e2e72b3afa78ec87da79",
+  "date": "2026-11-17T16:21:27",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 13.9,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

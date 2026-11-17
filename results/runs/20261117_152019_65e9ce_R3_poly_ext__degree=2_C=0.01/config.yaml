@@ -1,0 +1,22 @@
+name: R3_poly_ext__degree=2_C=0.01
+zeros:
+  name: to_nan
+missing_flags:
+  name: none
+imputer:
+  name: median
+features:
+  name: none
+drop_cols:
+  name: cholesterol_fastingbs
+encoding:
+  name: onehot
+scaler:
+  name: standard
+selection:
+  name: none
+model:
+  name: svm
+  kernel: poly
+  degree: 2
+  C: 0.01

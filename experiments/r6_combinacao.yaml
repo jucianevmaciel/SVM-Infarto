@@ -20,33 +20,37 @@
 
 baseline_name: R6_baseline
 
-baseline:
-  zeros: to_nan             # ATUALIZAR: vencedor do R2_ausentes
-  missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
-  imputer: median           # ATUALIZAR: vencedor do R2_ausentes
-  features: none            # ATUALIZAR: vencedor do R2_oldpeak
-  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+baseline:                     # combinação dos vencedores R1-R5
+  zeros: to_nan               # R2 (trata o RestingBP = 0)
+  missing_flags: none         # R2_ausentes
+  imputer: median             # R2_ausentes
+  features: none              # R2_oldpeak
+  drop_cols: cholesterol_fastingbs   # R2_atalho
   encoding: onehot
-  scaler: standard          # ATUALIZAR: vencedor do R1
-  selection: none           # ATUALIZAR: vencedor do R4
-  model: {name: svm}        # ATUALIZAR: vencedor do R3 (+ class_weight, se venceu no R5)
-  # threshold: {name: tuned, scoring: f2}   # ATUALIZAR: vencedor do R5, se for o limiar
+  scaler: standard            # R1
+  selection: {name: kbest, k: 6}     # R4
+  model: {name: svm, kernel: linear, C: 0.01, class_weight: {0: 1, 1: 2}}   # R3 + R5
 
 experiments:
-  # --- ablação (exemplos; ajustar aos vencedores reais) ---
-  - name: R6_sem_tratamento_zeros
-    override: {zeros: none, missing_flags: none, imputer: none}
+  # --- ablação: cada experimento tira (ou devolve) UM vencedor ---
+  # Sem o peso do R5: é exatamente a config do vencedor do R4 (pulada pelo hash).
+  # Entra no compare por --incluir 20261117_153215_ec5fa1_R4_kbest__k=6
 
-  - name: R6_sem_selecao
+  - name: R6_sem_selecao              # R4: volta para as 16 colunas
     override: {selection: none}
 
-  - name: R6_sem_limiar
-    override: {threshold: none}
+  - name: R6_com_fastingbs            # R2: devolve o FastingBS (ressalva do R2)
+    override: {drop_cols: cholesterol}
 
-  # --- reajuste: grade pequena em volta do vencedor do R3 (ex.: C/3 a C*3) ---
-  - name: R6_reajuste
+  - name: R6_kernel_poly2             # R3: o melhor kernel, já com peso e seleção
     override:
-      model: {name: svm, kernel: rbf}   # ATUALIZAR: kernel do vencedor (+ class_weight)
-    sweep:
-      model.C: [0.3, 1.0, 3.0]          # ATUALIZAR: em volta do C vencedor
-      model.gamma: [0.003, 0.01, 0.03]  # ATUALIZAR: em volta do gamma vencedor
+      model: {name: svm, kernel: poly, degree: 2, C: 0.1, class_weight: {0: 1, 1: 2}}
+
+  # --- reajuste do C: com o peso, o C efetivo dos doentes dobrou ---
+  - name: R6_reajuste_C0.003
+    override:
+      model: {name: svm, kernel: linear, C: 0.003, class_weight: {0: 1, 1: 2}}
+
+  - name: R6_reajuste_C0.03
+    override:
+      model: {name: svm, kernel: linear, C: 0.03, class_weight: {0: 1, 1: 2}}

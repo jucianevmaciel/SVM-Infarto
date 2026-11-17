@@ -1,0 +1,18 @@
+{
+  "run_id": "20261116_164023_c1326b_R2_ausentes_idade__missing_flags=none",
+  "name": "R2_ausentes_idade__missing_flags=none",
+  "hash": "c1326b4aea53f709058f72b6dcd37a323e8e17ef5510d1a1bc5a6e2e4d060858",
+  "date": "2026-11-16T16:40:23",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 25.74,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

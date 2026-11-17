@@ -1,0 +1,15 @@
+{
+  "tipo": "SVC",
+  "kernel": "sigmoid",
+  "C": 10.0,
+  "gamma": 0.01,
+  "gamma_efetivo": 0.01,
+  "degree": null,
+  "n_features": 16,
+  "vetores_suporte": 262,
+  "vetores_suporte_por_classe": [
+    129,
+    133
+  ],
+  "pct_vetores_suporte": 40.8
+}

@@ -24,16 +24,16 @@ baseline:
   missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
   imputer: median           # ATUALIZAR: vencedor do R2_ausentes
   features: none            # ATUALIZAR: vencedor do R2_oldpeak
-  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  drop_cols: cholesterol_fastingbs           # ATUALIZAR: vencedor do R2_atalho
   encoding: onehot
   scaler: standard          # ATUALIZAR: vencedor do R1
   selection: none
-  model: {name: svm}        # ATUALIZAR: vencedor do R3 (kernel, C, gamma/degree)
+  model: {name: svm, kernel: linear, C: 0.01}        # ATUALIZAR: vencedor do R3 (kernel, C, gamma/degree)
 
 experiments:
   - name: R4_rfe
     override:
-      selection: {name: rfe_linear}
+      selection: {name: rfe_linear, C: 0.01}
     sweep:
       selection.n_features: [6, 9, 12, 15]
 
@@ -42,3 +42,15 @@ experiments:
       selection: {name: kbest}
     sweep:
       selection.k: [6, 9, 12, 15]
+
+  - name: R4_rfe_ext
+    override:
+      selection: {name: rfe_linear, C: 0.01}
+    sweep:
+      selection.n_features: [3, 4]
+
+  - name: R4_kbest_ext
+    override:
+      selection: {name: kbest}
+    sweep:
+      selection.k: [3, 4]

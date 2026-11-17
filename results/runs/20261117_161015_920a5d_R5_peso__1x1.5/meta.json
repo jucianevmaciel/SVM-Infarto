@@ -1,0 +1,18 @@
+{
+  "run_id": "20261117_161015_920a5d_R5_peso__1x1.5",
+  "name": "R5_peso__1x1.5",
+  "hash": "920a5da77308bb6754de45143ca8b191082e04dff87dbccb5bacc39dd30788d2",
+  "date": "2026-11-17T16:10:15",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 13.76,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

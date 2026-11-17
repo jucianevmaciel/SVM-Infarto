@@ -1,5 +1,7 @@
 """Etapa 4 (features): verificação do Oldpeak negativo (R2) e etapa 5 (drop_cols).
 Regras fixas, não aprendem nada.
+drop_cols: cholesterol (tira o valor do colesterol), fastingbs (tira o FastingBS) ou
+cholesterol_fastingbs (tira os dois), R2_atalho.
 
 Oldpeak é o desnível do segmento ST no esforço. Positivo = infradesnivelamento (o comum);
 negativo = SUPRAdesnivelamento, sinal clássico de infarto. Por isso as linhas NÃO são removidas.
@@ -62,3 +64,24 @@ def drop_cholesterol():
     por um atalho ("veio daquele hospital"), não por fisiologia.
     """
     return DropCols(("Cholesterol",))
+
+
+def drop_fastingbs():
+    """Tira o FastingBS (glicemia de jejum > 120 mg/dL).
+
+    Achado da análise de correlação: o FastingBS é a variável mais associada à ausência do
+    colesterol (V de Cramér 0,36; 43% dos pacientes com FastingBS = 1 não têm colesterol
+    registrado, contra 10% dos com FastingBS = 0). Parte da sua associação com o alvo pode vir do
+    mesmo efeito de hospital de origem. R2_atalho__sem_fastingbs mede quanto ele contribui.
+    """
+    return DropCols(("FastingBS",))
+
+
+def drop_cholesterol_fastingbs():
+    """Tira o Cholesterol e o FastingBS juntos (R2_atalho, caminho C).
+
+    No R2, sem_colesterol e sem_fastingbs empataram com o baseline cada um sozinho, mas a
+    remoção dos dois juntos não tinha sido testada: o FastingBS pode compensar parte do que se
+    perde com o colesterol (ou o contrário).
+    """
+    return DropCols(("Cholesterol", "FastingBS"))

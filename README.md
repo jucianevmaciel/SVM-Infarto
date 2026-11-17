@@ -26,6 +26,30 @@ O `make_split` gera os dois splits (estratificados, seed 42) e mostra os problem
 
 O 80/20 não escolhe nada. Escolher o split pelo melhor teste seria usar o teste para decidir.
 
+## 1.1 Antes das rodadas: correlação entre as variáveis
+
+```bash
+python correlacao.py                 # treino do 70/30 (o padrão)
+python correlacao.py --split 80_20   # opcional, para conferir que o retrato é o mesmo
+```
+
+Análise exploratória, feita **só no treino** (o teste continua isolado). Não altera os dados
+nem entra no pipeline: os zeros impossíveis viram ausentes e a flag `Cholesterol_missing` é
+acrescentada só para a análise. Cada par recebe a medida adequada ao tipo:
+
+| Par | Medida |
+|---|---|
+| contínua x contínua | Pearson e Spearman (com sinal); \|Spearman\| na matriz mista |
+| discreta x discreta | V de Cramér com correção de viés |
+| discreta x contínua | razão de correlação eta |
+| cada variável x alvo | ponto-bisserial + Mann-Whitney (contínuas), V de Cramér + qui-quadrado (discretas), informação mútua (todas) |
+
+Também calcula o VIF das contínuas e a % de doentes em cada categoria. Leituras para as
+rodadas: pares redundantes (R4 e R8), ranking contra o alvo (o "esperado" do teste de
+sanidade do R8) e o tamanho do atalho do colesterol (R2). Grava em
+`results/correlacao/<split>/` (CSVs e as figuras `heatmap_numericas.png`,
+`heatmap_associacao.png` e `alvo.png`). Anote os achados em `docs/anotacoes_artigo.md`.
+
 ## 2. Rotina de cada rodada
 
 ```bash
@@ -63,7 +87,7 @@ Toda execução passa pelas mesmas etapas, nesta ordem. Cada uma recebe uma opç
 | `missing_flags` | **none**, flags | acrescenta `Cholesterol_missing` ("was_missing") |
 | `imputer` | **median**, median_by_group, knn_scaled, iterative, none | preenche os ausentes (iterative = MICE). Grupo: `Sex` ou `age_band`, nunca o alvo |
 | `features` | **none**, oldpeak_abs, st_elevation | Oldpeak negativo (R2) |
-| `drop_cols` | **none**, cholesterol | tira a coluna Cholesterol (R2_atalho; a flag, se houver, fica) |
+| `drop_cols` | **none**, cholesterol, fastingbs, cholesterol_fastingbs | tira a coluna Cholesterol (a flag, se houver, fica), a FastingBS ou as duas (R2_atalho) |
 | `encoding` | **onehot** | categóricas viram colunas 0/1 (obrigatória) |
 | `scaler` | none, **standard**, minmax, robust | só nas contínuas (Age, RestingBP, Cholesterol, MaxHR, Oldpeak) |
 | `selection` | **none**, rfe_linear, kbest | seleção de colunas (R4) |
@@ -140,7 +164,7 @@ variância): não é o modelo avaliado, e isso deve ser dito na apresentação.
 | `coeficientes_lineares.csv` | só no kernel linear e na logreg |
 
 Outras saídas: `results/summary.csv`, `results/comparacoes/`, `results/figuras/` (mapas de
-calor e fronteira 2D), `results/robustez/`, `results/final/` (métricas, matriz de confusão e curva ROC no teste).
+calor e fronteira 2D), `results/correlacao/`, `results/robustez/`, `results/final/` (métricas, matriz de confusão e curva ROC no teste).
 
 ## 8. Estrutura
 
@@ -159,6 +183,7 @@ SVM-Infarto/
 ├── experiments/       um YAML por rodada
 ├── docs/anotacoes_artigo.md      decisões, achados e limitações
 ├── results/
+├── correlacao.py      análise de correlação (antes do R0)
 ├── run_experiments.py, summarize.py, compare.py
 ├── heatmap_c_gamma.py, fronteira_2d.py, robustez.py, final_test.py, split_check.py
 └── CLAUDE.md

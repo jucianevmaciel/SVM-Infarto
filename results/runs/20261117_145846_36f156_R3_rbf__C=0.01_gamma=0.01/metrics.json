@@ -1,0 +1,38 @@
+{
+  "accuracy": {
+    "mean": 0.55296753875969,
+    "std": 0.002106513708062094
+  },
+  "precision": {
+    "mean": 0.55296753875969,
+    "std": 0.002106513708062094
+  },
+  "recall": {
+    "mean": 1.0,
+    "std": 0.0
+  },
+  "specificity": {
+    "mean": 0.0,
+    "std": 0.0
+  },
+  "f1": {
+    "mean": 0.7121407035175881,
+    "std": 0.001747877102890517
+  },
+  "balanced_accuracy": {
+    "mean": 0.5,
+    "std": 0.0
+  },
+  "roc_auc": {
+    "mean": 0.8862888644632464,
+    "std": 0.02869116219619219
+  },
+  "brier": {
+    "mean": null,
+    "std": null
+  },
+  "log_loss": {
+    "mean": null,
+    "std": null
+  }
+}

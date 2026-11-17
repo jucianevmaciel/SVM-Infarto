@@ -1,0 +1,19 @@
+name: R2_ausentes__imputer=knn_scaled_missing_flags=none
+zeros:
+  name: to_nan
+missing_flags:
+  name: none
+imputer:
+  name: knn_scaled
+features:
+  name: none
+drop_cols:
+  name: none
+encoding:
+  name: onehot
+scaler:
+  name: standard
+selection:
+  name: none
+model:
+  name: svm

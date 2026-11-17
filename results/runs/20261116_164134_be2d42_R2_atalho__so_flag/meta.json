@@ -1,0 +1,18 @@
+{
+  "run_id": "20261116_164134_be2d42_R2_atalho__so_flag",
+  "name": "R2_atalho__so_flag",
+  "hash": "be2d42e307cf39745d430737568af1acb8bf971ddd8dc4cc09d836a50bd8f50b",
+  "date": "2026-11-16T16:41:34",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 20.18,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

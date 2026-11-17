@@ -1,0 +1,20 @@
+name: R3_rbf__C=1.0_gamma=0.1
+zeros:
+  name: to_nan
+missing_flags:
+  name: none
+imputer:
+  name: median
+features:
+  name: none
+drop_cols:
+  name: cholesterol_fastingbs
+encoding:
+  name: onehot
+scaler:
+  name: standard
+selection:
+  name: none
+model:
+  name: svm
+  gamma: 0.1

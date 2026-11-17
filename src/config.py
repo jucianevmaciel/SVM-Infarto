@@ -15,6 +15,7 @@ SUMMARY_CSV = BASE / "results/summary.csv"
 COMPARACOES_DIR = BASE / "results/comparacoes"
 FIGURAS_DIR = BASE / "results/figuras"
 ROBUSTEZ_DIR = BASE / "results/robustez"
+CORRELACAO_DIR = BASE / "results/correlacao"
 
 SEED = 42
 

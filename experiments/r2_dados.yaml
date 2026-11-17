@@ -32,6 +32,20 @@
 #       fica sem o colesterol (menos colunas, sem depender do atalho).
 #     - se a flag vencer o R2_ausentes, conferir no robustez.py (R9) se o desempenho se
 #       mantém no subgrupo "colesterol registrado". Se cair, o ganho era o atalho.
+#   R2_atalho__sem_fastingbs    tira o FastingBS (acrescentado depois da análise de correlação:
+#                               ele é a variável mais associada à falta do colesterol, V = 0,36;
+#                               pode carregar o mesmo efeito de hospital)
+#   Leitura (REGISTRADA ANTES DE RODAR): comparar com o baseline (mesma config com o FastingBS).
+#     - empata -> o FastingBS não acrescenta nada além das outras colunas: sai (regra da mais
+#       simples), e a decisão vale para as rodadas seguintes.
+#     - piora significativamente -> carrega informação (clínica ou de origem, não dá para
+#       separar aqui): fica, e a dúvida vai para o R8 (importância) e as limitações.
+#   R2_atalho__sem_colesterol_fastingbs   tira os dois juntos (acrescentado DEPOIS de rodar o R2,
+#                               antes de fechá-lo: sem_colesterol e sem_fastingbs empataram com o
+#                               baseline cada um sozinho, sem_fastingbs no limite, p = 0,085)
+#   Leitura (REGISTRADA ANTES DE RODAR): comparar com R2_atalho__sem_colesterol.
+#     - empata -> os dois saem (regra da mais simples).
+#     - piora significativamente -> sai só o Cholesterol; o FastingBS fica.
 #   Fechar: python compare.py --rodada R2_atalho --incluir <R2_ausentes__imputer=median_missing_flags=flags>
 #           <vencedor do R2_ausentes> --salvar   (as pastas, em results/runs/)
 #
@@ -81,6 +95,12 @@ experiments:
 
   - name: R2_atalho__so_flag
     override: {missing_flags: flags, drop_cols: cholesterol}
+
+  - name: R2_atalho__sem_fastingbs
+    override: {drop_cols: fastingbs}
+
+  - name: R2_atalho__sem_colesterol_fastingbs
+    override: {drop_cols: cholesterol_fastingbs}
 
   - name: R2_oldpeak
     sweep:

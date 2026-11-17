@@ -1,0 +1,18 @@
+{
+  "run_id": "20261116_221432_b974c7_R2_atalho__sem_colesterol_fastingbs",
+  "name": "R2_atalho__sem_colesterol_fastingbs",
+  "hash": "b974c73d13573fc7965ca3e256f9ea7196675e04a9b55fcc7484ac64785d5716",
+  "date": "2026-11-16T22:14:32",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 13.62,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

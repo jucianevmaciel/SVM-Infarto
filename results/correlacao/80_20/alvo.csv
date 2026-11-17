@@ -1,0 +1,13 @@
+variavel,tipo,medida,valor,forca,teste,p_valor,info_mutua,n,media_doentes,media_saudaveis
+ST_Slope,discreta,V de Cramér,0.6474,0.6474,qui-quadrado,7.302e-68,0.2269,734,,
+ChestPainType,discreta,V de Cramér,0.537,0.537,qui-quadrado,3.36e-46,0.1557,734,,
+ExerciseAngina,discreta,V de Cramér,0.4898,0.4898,qui-quadrado,2.348e-40,0.1295,734,,
+MaxHR,contínua,ponto-bisserial,-0.4072,0.4072,Mann-Whitney,1.017e-28,0.08238,734,126.9,148.1
+Oldpeak,contínua,ponto-bisserial,0.3766,0.3766,Mann-Whitney,2.863e-26,0.09959,734,1.223,0.4226
+Cholesterol_missing,discreta,V de Cramér,0.3195,0.3195,qui-quadrado,3.075e-18,0.05944,734,,
+Sex,discreta,V de Cramér,0.278,0.278,qui-quadrado,3.154e-14,0.03974,734,,
+FastingBS,discreta,V de Cramér,0.2589,0.2589,qui-quadrado,1.424e-12,0.03635,734,,
+Age,contínua,ponto-bisserial,0.2447,0.2447,Mann-Whitney,4.838e-12,0.06389,734,55.92,51.28
+RestingECG,discreta,V de Cramér,0.1029,0.1029,qui-quadrado,0.007563,0.006751,734,,
+RestingBP,contínua,ponto-bisserial,0.1021,0.1021,Mann-Whitney,0.003879,0.02798,734,134.5,130.8
+Cholesterol,contínua,ponto-bisserial,0.08129,0.08129,Mann-Whitney,0.0134,0.01766,605,251.6,241.9

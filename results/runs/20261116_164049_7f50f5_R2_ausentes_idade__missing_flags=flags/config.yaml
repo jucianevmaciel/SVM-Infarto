@@ -1,0 +1,20 @@
+name: R2_ausentes_idade__missing_flags=flags
+zeros:
+  name: to_nan
+missing_flags:
+  name: flags
+imputer:
+  name: median_by_group
+  group: age_band
+features:
+  name: none
+drop_cols:
+  name: none
+encoding:
+  name: onehot
+scaler:
+  name: standard
+selection:
+  name: none
+model:
+  name: svm

@@ -1,0 +1,18 @@
+{
+  "run_id": "20261116_164211_f74904_R2_oldpeak__features=st_elevation",
+  "name": "R2_oldpeak__features=st_elevation",
+  "hash": "f74904043778d0c02f3ecd35b61b84489b001c7d67577884fc857c3e90ccadea",
+  "date": "2026-11-16T16:42:11",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 20.39,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

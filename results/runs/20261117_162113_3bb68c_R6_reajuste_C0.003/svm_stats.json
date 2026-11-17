@@ -1,0 +1,15 @@
+{
+  "tipo": "SVC",
+  "kernel": "linear",
+  "C": 0.003,
+  "gamma": "scale",
+  "gamma_efetivo": null,
+  "degree": null,
+  "n_features": 6,
+  "vetores_suporte": 433,
+  "vetores_suporte_por_classe": [
+    287,
+    146
+  ],
+  "pct_vetores_suporte": 67.4
+}

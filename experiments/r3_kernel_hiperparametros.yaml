@@ -42,7 +42,7 @@ baseline:
   missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
   imputer: median           # ATUALIZAR: vencedor do R2_ausentes
   features: none            # ATUALIZAR: vencedor do R2_oldpeak
-  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  drop_cols: cholesterol_fastingbs           # ATUALIZAR: vencedor do R2_atalho
   encoding: onehot
   scaler: standard          # ATUALIZAR: vencedor do R1
   selection: none
@@ -75,3 +75,15 @@ experiments:
     sweep:
       model.C: [0.1, 1.0, 10.0]
       model.gamma: [0.01, scale]
+
+  - name: R3_poly_ext          # ponta de baixo do C no poly
+    override: {model: {name: svm, kernel: poly}}
+    sweep:
+      model.degree: [2, 3, 4]
+      model.C: [0.01]
+
+  - name: R3_rbf_ext           # seguir a crista do rbf (ponta de cima do C)
+    override: {model: {name: svm, kernel: rbf}}
+    sweep:
+      model.C: [1000.0]
+      model.gamma: [0.001, 0.01]

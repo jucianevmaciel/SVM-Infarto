@@ -1,0 +1,19 @@
+name: R2_ausentes__imputer=median_by_group_missing_flags=none
+zeros:
+  name: to_nan
+missing_flags:
+  name: none
+imputer:
+  name: median_by_group
+features:
+  name: none
+drop_cols:
+  name: none
+encoding:
+  name: onehot
+scaler:
+  name: standard
+selection:
+  name: none
+model:
+  name: svm

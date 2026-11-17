@@ -1,0 +1,18 @@
+{
+  "run_id": "20261117_152046_3d09ec_R3_poly_ext__degree=4_C=0.01",
+  "name": "R3_poly_ext__degree=4_C=0.01",
+  "hash": "3d09ec396e221718b71f8dfc04bf02ce0b84821fb45b92f53f519dbfeaf5f73b",
+  "date": "2026-11-17T15:20:46",
+  "split": "70_30",
+  "train_sha256": "75f67f39e31c8cf5226450ce6459e9bc222fbfb0690256b92aeaa63667234c79",
+  "n_train": 642,
+  "seed": 42,
+  "cv": "RepeatedStratifiedKFold(5x5)",
+  "elapsed_s": 12.96,
+  "versions": {
+    "python": "3.14.7",
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.4"
+  }
+}

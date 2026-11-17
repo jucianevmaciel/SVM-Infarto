@@ -28,17 +28,25 @@ baseline:
   missing_flags: none       # ATUALIZAR: vencedor do R2_ausentes
   imputer: median           # ATUALIZAR: vencedor do R2_ausentes
   features: none            # ATUALIZAR: vencedor do R2_oldpeak
-  drop_cols: none           # ATUALIZAR: vencedor do R2_atalho
+  drop_cols: cholesterol_fastingbs           # ATUALIZAR: vencedor do R2_atalho
   encoding: onehot
   scaler: standard          # ATUALIZAR: vencedor do R1
-  selection: none           # ATUALIZAR: vencedor do R4
-  model: {name: svm}        # ATUALIZAR: vencedor do R3
+  selection: {name: kbest, k: 6}         # ATUALIZAR: vencedor do R4
+  model: {name: svm, kernel: linear, C: 0.01}      # ATUALIZAR: vencedor do R3
 
 experiments:
   # O override substitui o model inteiro: repetir o vencedor do R3 + class_weight
-  - name: R5_peso
+  - name: R5_peso__balanced
     override:
-      model: {name: svm, class_weight: balanced}   # ATUALIZAR: vencedor do R3 + class_weight
+      model: {name: svm, kernel: linear, C: 0.01, class_weight: balanced}
+
+  - name: R5_peso__1x1.5
+    override:
+      model: {name: svm, kernel: linear, C: 0.01, class_weight: {0: 1, 1: 1.5}}
+
+  - name: R5_peso__1x2
+    override:
+      model: {name: svm, kernel: linear, C: 0.01, class_weight: {0: 1, 1: 2}}
 
   - name: R5_limiar
     override:

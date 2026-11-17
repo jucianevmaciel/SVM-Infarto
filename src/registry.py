@@ -36,6 +36,8 @@ REGISTRY = {
     "drop_cols": {
         "none": None,
         "cholesterol": features.drop_cholesterol,
+        "fastingbs": features.drop_fastingbs,
+        "cholesterol_fastingbs": features.drop_cholesterol_fastingbs,
     },
     "encoding": {
         "onehot": encoding.onehot,

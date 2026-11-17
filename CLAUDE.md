@@ -16,6 +16,7 @@ Todos rodam a partir da raiz, com o `.venv`:
 ```bash
 pip install -r requirements.txt
 python -m src.make_split                                             # data/raw/heart.csv -> data/split/70_30 e 80_20 (uma vez)
+python correlacao.py [--split 70_30] [--limiar 0.5]                  # correlação entre as variáveis (antes do R0, só treino)
 python run_experiments.py experiments/r0_baselines.yaml              # uma rodada
 python run_experiments.py experiments/r3_kernel_hiperparametros.yaml --only R3_linear   # um experimento (ou um sweep inteiro)
 python run_experiments.py experiments/r1_escalonamento.yaml --force  # repete, cria pasta nova
@@ -80,9 +81,10 @@ Todas no split 70/30, CV 5x5 estratificada (`SEED=42`).
 
 | Arquivo | Pergunta | Critério |
 |---|---|---|
+| `correlacao.py` (antes do R0) | correlação/associação entre as variáveis e com o alvo (Pearson/Spearman, V de Cramér, eta, informação mútua, VIF) | exploratória: não escolhe nada |
 | `r0_baselines.yaml` | dummy, logreg, gboost | não há escolha |
 | `r1_escalonamento.yaml` | `scaler` | roc_auc; none → standard → minmax → robust |
-| `r2_dados.yaml` | `R2_ausentes` (imputer median/median_by_group/knn_scaled/iterative x flag; zeros crus), `R2_atalho` (`drop_cols`: sem a coluna / só a flag) e `R2_oldpeak` (`features`) | roc_auc; fechadas separadamente; regra de leitura do atalho no YAML |
+| `r2_dados.yaml` | `R2_ausentes` (imputer median/median_by_group/knn_scaled/iterative x flag; zeros crus), `R2_atalho` (`drop_cols`: sem o colesterol / só a flag / sem o FastingBS / sem os dois) e `R2_oldpeak` (`features`) | roc_auc; fechadas separadamente; regra de leitura do atalho no YAML |
 | `r3_kernel_hiperparametros.yaml` | 4 kernels já ajustados: C x gamma (rbf), C (linear), grau x C (poly), C x gamma (sigmoid) | roc_auc; escolhe o kernel; linear → rbf → poly → sigmoid, menor C/gamma no empate |
 | `r4_selecao.yaml` | `rfe_linear` / `kbest` | roc_auc; menos colunas no empate |
 | `r5_recall.yaml` | `class_weight` e `threshold: tuned` (f1, f2, balanced_accuracy) | recall com especificidade mínima (registrar antes) |

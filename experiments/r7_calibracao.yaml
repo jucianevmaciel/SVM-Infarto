@@ -20,17 +20,16 @@
 
 baseline_name: R7_baseline
 
-baseline:
-  zeros: to_nan             # ATUALIZAR: configuração escolhida no R6
+baseline:                     # configuração final do R6 + calibração
+  zeros: to_nan
   missing_flags: none
   imputer: median
   features: none
-  drop_cols: none
+  drop_cols: cholesterol_fastingbs
   encoding: onehot
   scaler: standard
-  selection: none
-  model: {name: svm}
-  # threshold: {name: tuned, scoring: f2}
+  selection: {name: kbest, k: 6}
+  model: {name: svm, kernel: linear, C: 0.01, class_weight: {0: 1, 1: 2}}
   calibration: sigmoid
 
 experiments:
