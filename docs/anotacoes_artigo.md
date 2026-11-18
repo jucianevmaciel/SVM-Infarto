@@ -685,7 +685,117 @@ equilibrado entre os sexos que a regressão logística com todas as colunas.
 
 ### Teste final (70/30)
 
+Avaliado UMA vez (`python final_test.py`, 17/11/2026), no conjunto de teste do 70/30: 276
+pacientes (153 doentes, 123 saudáveis). Classificador: o final do R6
+(`20261117_161029_156add_R5_peso__1x2`). Comparação: os baselines do R0 (dummy, logreg, gboost,
+com todas as colunas) e a versão calibrada do R7 (`20261117_163434_74c6bd_R7_baseline`, limiar
+0,5). Saídas em `results/final/20261117_161029_156add_R5_peso__1x2/` (métricas, matriz de
+confusão, curva ROC e `baselines.csv`).
+
+**SVM final: CV x teste**
+
+| Métrica | CV 70/30 (média ± desvio) | Teste |
+|---|---|---|
+| roc_auc | 0,899 ± 0,025 | **0,910** |
+| recall | 0,912 ± 0,036 | **0,908** (139 de 153; 14 perdidos) |
+| especificidade | 0,721 ± 0,049 | **0,756** (93 de 123; 30 falsos positivos) |
+| acurácia | 0,826 | 0,841 |
+| precisão | - | 0,822 |
+| f1 | - | 0,863 |
+
+Matriz de confusão (linhas = real, colunas = previsto):
+
+| | sem doença | com doença |
+|---|---|---|
+| sem doença | 93 | 30 |
+| com doença | 14 | 139 |
+
+- **O teste confirma a CV:** todas as métricas dentro do desvio da CV, e roc_auc e
+  especificidade um pouco acima. O otimismo da seleção (Limitações) não se manifestou.
+- **O ponto de operação do R5 se manteve fora da amostra:** recall 0,908 com especificidade
+  0,756 (acima do mínimo de 0,70 definido no R5).
+
+**Comparação com os baselines no teste**
+
+| Modelo | roc_auc | recall | especificidade | acurácia | brier | FN / FP |
+|---|---|---|---|---|---|---|
+| SVM final (R6) | 0,910 | **0,908** | 0,756 | 0,841 | - | **14** / 30 |
+| SVM calibrado (R7, limiar 0,5) | 0,910 | 0,830 | 0,829 | 0,830 | 0,117 | 26 / 21 |
+| logreg R0 | 0,930 | 0,889 | 0,862 | 0,877 | 0,097 | 17 / 17 |
+| gboost R0 | **0,934** | 0,882 | **0,894** | **0,888** | **0,093** | 18 / 13 |
+| dummy R0 | 0,500 | 1,000 | 0,000 | 0,554 | 0,446 | 0 / 123 |
+
+- **O SVM final NÃO supera os baselines no roc_auc:** logreg e gboost ficam ~0,02 acima (0,930 e
+  0,934 contra 0,910), como já acontecia na CV (logreg 0,916 contra 0,899). Com 276 pacientes, a
+  incerteza do roc_auc no teste é de ~±0,02: a diferença está no limite. Não foi feito teste
+  pareado (ex.: DeLong) no teste; sem ele, não dá para afirmar nem que o SVM é pior nem
+  equivalente.
+- **Troca do SVM:** identifica 3 a 4 doentes a mais (14 perdidos, contra 17 da logreg e 18 do
+  gboost), ao custo de 13 a 17 falsos positivos a mais. É a consequência do peso {0: 1, 1: 2}
+  do R5, escolhido de propósito (o falso negativo é o erro mais caro).
+- **Parte da vantagem dos baselines pode vir do atalho:** eles usam Cholesterol e FastingBS,
+  ligados ao hospital de origem (R2). O teste vem dos MESMOS hospitais, então não penaliza o
+  atalho; num hospital novo a diferença pode ser menor (não medido).
+- **O que justifica o SVM final não é a nota, é o perfil:** recall mais alto, só 4 variáveis
+  efetivamente usadas (ST_Slope, ChestPainType, ExerciseAngina, MaxHR; R8), independência das
+  variáveis ligadas ao hospital de origem (R2) e mais equilíbrio entre os sexos que a logreg
+  (R9). Confirma a troca prevista no R6 (~0,02 de roc_auc por simplicidade e independência do
+  atalho).
+- **Calibrado (R7):** roc_auc idêntico ao do SVM (0,910; o método de Platt não muda a ordem dos
+  pacientes). No limiar 0,5, o recall cai para 0,830 (26 doentes perdidos), como previsto no R7:
+  a calibração desfaz o peso do R5. Serve para o risco em %, não para a decisão. O brier (0,117)
+  fica acima do da logreg (0,097) e do gboost (0,093), que usam todas as colunas.
+
 ### R10 - Split 80/20
+
+Análise de sensibilidade (opção B do grupo: o 80/20 não escolhe nada). A configuração final do
+70/30 foi refeita no 80/20 (`20261117_235218_1776a5_R10_svm`; 734 pacientes no treino, 184 no
+teste: 102 doentes, 82 saudáveis), junto com os baselines espelhando o R0 (todas as colunas, sem
+seleção): `20261117_235307_794042_R10_dummy`, `20261117_235335_b36241_R10_logreg`,
+`20261117_235408_bdd18f_R10_gboost`. Configs conferidas: idênticas às do 70/30, só muda o split.
+Saídas: `results/comparacoes/R10_splits.csv` e `results/final/20261117_235218_1776a5_R10_svm/`.
+
+**SVM final: 70/30 x 80/20** (`split_check.py`; sem teste t, porque treinos e folds são
+diferentes: a leitura é se a diferença cabe no desvio da CV)
+
+| Métrica | CV 70/30 | CV 80/20 | dif CV (80-70) | dentro do desvio? | teste 70/30 | teste 80/20 |
+|---|---|---|---|---|---|---|
+| roc_auc | 0,899 ± 0,025 | 0,904 ± 0,032 | +0,006 | sim | 0,910 | 0,885 |
+| recall | 0,912 ± 0,036 | 0,910 ± 0,032 | -0,002 | sim | 0,908 | 0,892 |
+| especificidade | 0,721 ± 0,049 | 0,746 ± 0,063 | +0,025 | sim | 0,756 | 0,732 |
+| acurácia | 0,826 ± 0,028 | 0,837 ± 0,032 | +0,010 | sim | 0,841 | 0,821 |
+| f1 | 0,853 ± 0,024 | 0,860 ± 0,026 | +0,007 | sim | 0,863 | 0,847 |
+
+- **O SVM não depende do split:** todas as diferenças da CV ficam dentro do desvio. No teste, o
+  roc_auc do 80/20 (0,885) fica 0,025 abaixo do 70/30, também dentro do desvio da CV e da
+  incerteza de um teste com 184 pacientes (~±0,025). Matriz de confusão do 80/20: 60 VN, 22 FP,
+  11 FN, 91 VP.
+
+**Baselines no 80/20**
+
+| Modelo | CV roc_auc | CV recall | teste roc_auc | teste recall | teste especificidade | FN / FP |
+|---|---|---|---|---|---|---|
+| SVM final | 0,904 | 0,910 | 0,885 | 0,892 | 0,732 | 11 / 22 |
+| logreg | 0,919 | 0,870 | **0,932** | **0,912** | 0,854 | **9** / 12 |
+| gboost | **0,920** | 0,876 | 0,915 | 0,873 | **0,866** | 13 / 11 |
+| dummy | 0,500 | 1,000 | 0,500 | 1,000 | 0,000 | 0 / 82 |
+
+- **A vantagem dos baselines no roc_auc se repete nos dois splits:** 0,015 a 0,02 na CV e no
+  teste do 70/30; 0,03 a 0,047 no teste do 80/20. É o resultado consistente da comparação.
+- **A vantagem do SVM em recall NÃO se repete:** no teste do 70/30, o SVM achava 3 a 4 doentes a
+  mais que os baselines; no do 80/20, a logreg acha 2 a mais que o SVM (93 contra 91 de 102). As
+  duas diferenças são de poucos pacientes (dentro do ruído), mas, juntas, mostram que a
+  vantagem de recall do SVM é pequena e frágil. Na CV, o SVM continua com recall maior (0,910
+  contra 0,870 e 0,876) nos dois splits.
+- **Ressalva:** os dois testes vêm da mesma base, e ~70% dos pacientes do teste 80/20 estavam no
+  treino do 70/30, usado para escolher a configuração. O teste 80/20 não é totalmente "novo"
+  para as escolhas; se isso o deixa otimista, reforça que o SVM não supera os baselines.
+
+**Conclusão do R10:** o desempenho do SVM final é estável entre os splits. A comparação com os
+baselines também é estável no roc_auc (os baselines ficam acima); a vantagem do SVM em recall
+aparece na CV, mas não de forma consistente nos testes. O argumento a favor do SVM final é o
+perfil do modelo (4 variáveis, sem as variáveis ligadas ao hospital de origem, mais equilíbrio
+entre os sexos que a logreg), não um desempenho superior.
 
 ## Limitações
 
@@ -707,7 +817,8 @@ equilibrado entre os sexos que a regressão logística com todas as colunas.
   treino. Reavaliado na ablação do R6.
 - **Otimismo da seleção:** o R3 testa 45 configurações (4 kernels) e escolhe a melhor; a nota de CV do
   vencedor tende a ser um pouco otimista (ele também venceu por acaso entre muitas). A
-  estimativa honesta é a do teste final, avaliado uma única vez.
+  estimativa honesta é a do teste final, avaliado uma única vez. Resultado: no teste, o
+  roc_auc (0,910) ficou até um pouco acima da CV (0,899); o otimismo não se manifestou.
 - **Teste pequeno para alguns casos:** só 1 Oldpeak negativo caiu em cada teste; o efeito
   dessa decisão só é medido na CV.
 - **Especificidade baixa em pacientes com 55 anos ou mais (R9):** 0,560 contra 0,813 abaixo de
@@ -719,3 +830,8 @@ equilibrado entre os sexos que a regressão logística com todas as colunas.
   hospital. Só 12 saudáveis no grupo: a especificidade dele (0,417) não é confiável.
 - **Subgrupos pequenos:** 40 mulheres doentes e 12 pacientes saudáveis sem colesterol no treino.
   As diferenças nesses grupos são indícios, não conclusões.
+- **O SVM final não supera os baselines (teste final e R10):** a regressão logística e o
+  gradient boosting do R0, com todas as colunas, têm roc_auc maior nos dois splits, e a
+  vantagem do SVM em recall não se repetiu no teste do 80/20. Parte da vantagem dos baselines
+  pode vir das variáveis ligadas ao hospital de origem, que os testes (dos mesmos hospitais)
+  não penalizam.
