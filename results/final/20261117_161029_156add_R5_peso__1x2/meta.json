@@ -1,0 +1,15 @@
+{
+  "run": "20261117_161029_156add_R5_peso__1x2",
+  "date": "2026-11-17T23:41:50",
+  "split": "70_30",
+  "n_test": 276,
+  "baselines": [
+    "20261116_162243_9c3dbf_R0_dummy",
+    "20261116_162259_aba988_R0_logreg",
+    "20261116_162319_f642d9_R0_gboost",
+    "20261117_163434_74c6bd_R7_baseline"
+  ],
+  "doentes_no_teste": 153,
+  "doentes_identificados": 139,
+  "doentes_perdidos (falsos negativos)": 14
+}
