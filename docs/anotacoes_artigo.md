@@ -616,6 +616,73 @@ de dor no peito (anamnese). Consequências:
 
 ### R9 - Robustez
 
+Modelo avaliado: o final do R6 (`20261117_161029_156add_R5_peso__1x2`). Para comparação, a
+regressão logística do R0 (`20261116_162259_aba988_R0_logreg`: as 11 colunas, inclusive
+Cholesterol e FastingBS; zeros -> NaN, mediana, SEM flag, sem peso). Só treino (642 pacientes);
+o teste não foi tocado. Saídas em `results/robustez/<run>/` (`sementes.csv`, `subgrupos.csv`).
+
+**1. Outras sementes da CV** (5x5 refeita com as sementes 1, 7, 13, 99 e 2024, além da 42):
+
+| Modelo | roc_auc | recall | especificidade | amplitude roc_auc / recall |
+|---|---|---|---|---|
+| SVM final | 0,897 a 0,900 | 0,909 a 0,912 | 0,721 a 0,725 | 0,003 / 0,003 |
+| logreg R0 | 0,916 a 0,918 | 0,853 a 0,862 | 0,810 a 0,815 | 0,003 / 0,009 |
+
+- **Estável:** a divisão dos folds quase não muda a nota. A amplitude entre sementes (0,003) é
+  menor que as diferenças que decidiram as rodadas (ex.: ~0,005 da saída do FastingBS no R2),
+  então as escolhas não foram efeito do sorteio dos folds.
+- Ressalva: isso mede só a variação devida à partição dos folds. A incerteza por ter só 642
+  pacientes aparece no desvio entre folds (~0,025 no roc_auc) e será medida no teste final.
+
+**2. Subgrupos** (previsões fora da amostra da CV principal: cada paciente é previsto pelos
+modelos que não o viram; média das 5 repetições). Formato: roc_auc / recall / especificidade.
+
+| Subgrupo | Pacientes (doentes / saudáveis) | SVM final | logreg R0 |
+|---|---|---|---|
+| Sex F | 137 (40 / 97) | 0,860 / 0,870 / 0,695 | 0,876 / **0,685** / 0,876 |
+| Sex M | 505 (315 / 190) | 0,907 / 0,917 / 0,734 | 0,909 / 0,874 / 0,777 |
+| Colesterol ausente | 113 (101 / 12) | 0,859 / 0,885 / 0,417 | 0,882 / 0,885 / 0,467 |
+| Colesterol registrado | 529 (254 / 275) | 0,902 / 0,923 / 0,734 | 0,911 / 0,840 / 0,825 |
+| Idade < 55 | 315 (133 / 182) | 0,931 / 0,887 / 0,813 | 0,945 / 0,815 / 0,898 |
+| Idade >= 55 | 327 (222 / 105) | 0,842 / 0,927 / **0,560** | 0,863 / 0,876 / 0,659 |
+
+Cuidado na leitura: o "desvio" gravado em `subgrupos.csv` (<= 0,016) é entre as repetições, que
+usam os MESMOS pacientes; não mede a incerteza do subgrupo. Para isso vale o tamanho do grupo
+(erro padrão aproximado de uma proporção: ~0,05 com ~100 pacientes, ~0,07 com 40, ~0,14 com 12).
+Também é esperado que o roc_auc dentro de cada subgrupo fique abaixo do global: parte do acerto
+global vem de ordenar bem pacientes de grupos diferentes.
+
+- **Idade >= 55 (achado principal):** especificidade 0,560 contra 0,813 abaixo de 55 anos
+  (~105 saudáveis; diferença bem maior que o erro esperado), e roc_auc 0,842 contra 0,931. O
+  modelo classifica como doentes muitos idosos saudáveis. A logreg tem a MESMA diferença entre
+  as faixas (0,659 contra 0,898; 0,24 contra 0,25 no SVM): a dificuldade vem da base/problema,
+  não das escolhas das rodadas. A especificidade do SVM é menor em todos os grupos por causa do
+  peso do R5 (troca consciente de especificidade por recall). Hipótese (não testada): 3 das 4
+  variáveis usadas vêm do teste ergométrico (ST_Slope, ExerciseAngina, MaxHR), e alterações no
+  teste e a queda da frequência máxima são mais comuns com a idade, mesmo sem doença.
+- **Mulheres: o SVM final é mais equilibrado que a logreg.** A logreg perde muito mais doentes
+  entre as mulheres (recall 0,685, contra 0,874 nos homens); o SVM fica em 0,870 contra 0,917.
+  Diferença entre os modelos: ~7 das 40 mulheres doentes. Explicação confirmada pelos
+  coeficientes: a logreg usa o Sex (`Sex_M` = +1,19, o 4º maior coeficiente) e, como a
+  prevalência é menor nas mulheres (29% contra 62%), baixa o risco de toda mulher. O SVM final
+  não usa o Sex (o kbest não o escolhe). Com 40 doentes, é evidência, não prova. Dentro do SVM,
+  a diferença entre os sexos (recall 0,870 x 0,917; especificidade 0,695 x 0,734) está dentro do
+  erro esperado.
+- **Colesterol ausente: inconclusivo quanto ao atalho.** Só 12 saudáveis nesse grupo (cada um
+  vale ~0,08 de especificidade). A logreg do R0 não tem a flag (o ausente recebe a mediana), então
+  também não "vê" a ausência e não serve para medir o atalho: o recall sai igual (0,885 nos dois).
+  Sinal favorável: no SVM final, o recall no grupo ausente (0,885) NÃO é maior que no registrado
+  (0,923), ou seja, o modelo não trata a ausência como sinal de doença (coerente com o R2). O
+  roc_auc menor no grupo ausente (0,859 contra 0,902), que vem quase todo da base suíça, é um
+  indício de desempenho pior num hospital diferente (ver Limitações).
+- Pendência opcional: rodar o `robustez.py` num modelo COM a flag
+  (`20261116_163728_4252a8_R2_ausentes__imputer=median_missing_flags=flags`) para ver a assinatura
+  do atalho no grupo ausente (recall perto de 1, especificidade baixa).
+
+**Conclusão do R9:** o resultado não depende da semente da CV. O modelo é pior em pacientes com
+55 anos ou mais (especificidade) e possivelmente na base suíça (grupo sem colesterol); é mais
+equilibrado entre os sexos que a regressão logística com todas as colunas.
+
 ### Teste final (70/30)
 
 ### R10 - Split 80/20
@@ -643,3 +710,12 @@ de dor no peito (anamnese). Consequências:
   estimativa honesta é a do teste final, avaliado uma única vez.
 - **Teste pequeno para alguns casos:** só 1 Oldpeak negativo caiu em cada teste; o efeito
   dessa decisão só é medido na CV.
+- **Especificidade baixa em pacientes com 55 anos ou mais (R9):** 0,560 contra 0,813 abaixo de
+  55 anos (CV). A mesma diferença aparece na regressão logística do R0, então vem da base e não
+  das escolhas do modelo. Na prática, o modelo gera mais falsos positivos (exames ou
+  encaminhamentos desnecessários) em idosos.
+- **Desempenho menor no grupo sem colesterol (R9):** roc_auc 0,859 contra 0,902. Esse grupo vem
+  quase todo da base suíça: indício de que o modelo funciona pior em pacientes de outro
+  hospital. Só 12 saudáveis no grupo: a especificidade dele (0,417) não é confiável.
+- **Subgrupos pequenos:** 40 mulheres doentes e 12 pacientes saudáveis sem colesterol no treino.
+  As diferenças nesses grupos são indícios, não conclusões.
